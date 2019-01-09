@@ -5,7 +5,10 @@
 export const environment = {
   production: false,
   poolResource: 'http://localhost:8080/pools',
-  userResource: 'http://localhost:8080/users'
+  userResource: 'http://localhost:8080/users',
+  parameterResource: 'http://localhost:8080/parameters',
+  designationResource: 'http://localhost:8080/designation',
+  wsEndpoint: 'http://localhost:8080/ws'
 };
 
 /*

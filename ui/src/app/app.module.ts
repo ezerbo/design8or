@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '../../node_modules/@angular/forms';
-
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AmazingTimePickerModule } from 'amazing-time-picker';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -10,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { AppRoutingModule } from './app.routes';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -24,9 +25,10 @@ import { AppRoutingModule } from './app.routes';
         BrowserModule,
         AppRoutingModule,
         HttpClientModule,
+        AmazingTimePickerModule,
         ReactiveFormsModule
     ],
-    providers: [],
+    providers: [DatePipe],
     bootstrap: [
         AppComponent
     ]
