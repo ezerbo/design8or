@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.Pool;
+import com.ss.design8or.model.Pools;
 import com.ss.design8or.repository.PoolRepository;
+import com.ss.design8or.repository.UserRepository;
 
 /**
  * @author ezerbo
@@ -24,16 +26,23 @@ public class PoolResource {
 	
 	private PoolRepository repository;
 	
-	public PoolResource(PoolRepository repository) {
+	private UserRepository userRepository;
+	
+	public PoolResource(PoolRepository repository, UserRepository userRepository) {
 		this.repository = repository;
+		this.userRepository = userRepository;
 	}
 	
 	@GetMapping
-	public ResponseEntity<Map<String, Object>> pools() {
-		Pageable page = PageRequest.of(0, 3);
-		Map<String, Object> pools =new HashMap<>();
-		pools.put("current", getCurrentPool());
-		pools.put("past", repository.findPast(page).getContent());
+	public ResponseEntity<Pools> pools() {
+		Pageable page = PageRequest.of(0, 2);
+		Pool currentPool = getCurrentPool();
+		Pools pools = Pools.builder()
+				.current(currentPool)
+				.past(repository.findPast(page).getContent())
+				.currentPoolProgress(calculateProgress(currentPool.getAssignments().size()))
+				.currentPoolParticipantsCount((long) currentPool.getAssignments().size())
+				.build();
 		return ResponseEntity.ok(pools);
 	}
 	
@@ -43,6 +52,11 @@ public class PoolResource {
 			return current.get();
 		}
 		return repository.save(new Pool());
+	}	
+	
+	private long calculateProgress(long currentPoolParticipantsCount) {
+		long totalNumberOfUsers = userRepository.count();
+		return totalNumberOfUsers == 0 ? 0 : (100 * currentPoolParticipantsCount) / totalNumberOfUsers;
 	}
 	
 }

@@ -32,6 +32,11 @@ public class UserResource {
 		this.repository = repository;
 	}
 	
+	@GetMapping
+	public ResponseEntity<List<User>> getAll() {
+		return ResponseEntity.ok(repository.findAll());
+	}
+	
 	@GetMapping("/candidates")
 	public ResponseEntity<List<User>> getNextCandidates() {
 		return ResponseEntity.ok(repository.getAssignmentCandidates());
