@@ -7,30 +7,38 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { HomeComponent } from './home/home.component';
-import { HeaderComponent } from './header/header.component';
-import { FooterComponent } from './footer/footer.component';
 import { AppRoutingModule } from './app.routes';
 import { DatePipe } from '@angular/common';
+import { LeadComponent } from './lead/lead.component';
+import { PoolComponent } from './pool/pool.component';
+import { RotationComponent } from './rotation/rotation.component';
+import { MessageComponent } from './message/message.component';
+import { UserComponent } from './user/user.component';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        PageNotFoundComponent,
-        HomeComponent,
-        HeaderComponent,
-        FooterComponent
-    ],
-    imports: [
-        FormsModule,
-        BrowserModule,
-        AppRoutingModule,
-        HttpClientModule,
-        AmazingTimePickerModule,
-        ReactiveFormsModule
-    ],
-    providers: [DatePipe],
-    bootstrap: [
-        AppComponent
-    ]
+   declarations: [
+      AppComponent,
+      PageNotFoundComponent,
+      HomeComponent,
+      LeadComponent,
+      PoolComponent,
+      RotationComponent,
+      MessageComponent,
+      UserComponent
+   ],
+   imports: [
+      FormsModule,
+      BrowserModule,
+      AppRoutingModule,
+      HttpClientModule,
+      AmazingTimePickerModule,
+      ReactiveFormsModule
+   ],
+   providers: [
+      DatePipe
+   ],
+   bootstrap: [
+      AppComponent
+   ]
 })
 export class AppModule { }

@@ -1,5 +1,3 @@
-import { Time } from "../../node_modules/@angular/common";
-
 export interface Pool {
     id: number
     startDate: Date
@@ -9,6 +7,8 @@ export interface Pool {
 export interface Pools {
     current: Pool
     past: Pool[]
+    currentPoolProgress: number
+    currentPoolParticipantsCount: number
 }
 
 export interface User {

@@ -1,244 +1,27 @@
-<div class="ui card" style="width: 80%; margin: auto;">
+<div class="ui card" style="width: 80%; margin-left: auto; margin-right: auto;">
   <div class="content">
-    <div class="header">
-      <h2 class="ui center aligned icon header">
-        <i class="hand point right outline icon"></i>
-        Design8or
-      </h2>
-      <div class="ui divider"></div>
-      <div class="ui card p-2 mb-2" *ngIf="currentPool" style="width: 100%; margin: auto;">
-        <label>Current pool started on: {{currentPool.startDate | date: 'short'}}</label>
+    <h2 class="ui icon header">
+      <i class="hand point right outline icon"></i>
+      Design8or
+    </h2>
+    <div class="ui divider"></div>
+    <div class="row links">
+      <div class="col-lg-4">
+        <div class="row links">
+          <div class="col-lg-12">
+            <app-lead></app-lead>
+          </div>
+          <div class="col-lg-12 mt-3 mb-3">
+            <app-pool></app-pool>
+          </div>
+        </div>
       </div>
-      <div class="row links">
-        <div class="col-lg-4">
-          <div class="row links">
-            <div class="col-lg-12" *ngIf="lead">
-              <div class="card">
-                <div class="card-header">Support Lead</div>
-                <div class="card-body">
-                  <label>First Name: {{lead.firstName}}</label>
-                  <br>
-                  <label>Last Name: {{lead.lastName}}</label>
-                  <br>
-                  <label>Email Address: {{lead.emailAddress}}</label>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-12 mt-3" *ngIf="parameter">
-              <div class="card">
-                <div class="card-header">Parameters</div>
-                <div class="card-body">
-                  <div>
-                    <div class="ui right labeled button" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="Change rotation time"
-                      (click)="selectDesignationTime()">
-                      <div class="ui icon button primary">
-                        <i class="clock icon"></i>
-                      </div>
-                      <label class="ui basic label hand-cursor">Rotation: Everyday at {{rotationTime() | date: 'shortTime'}}</label>
-                    </div>
-                    <div class="ui buttons" *ngIf="showRotationSaveBtn">
-                      <button class="ui button" (click)="cancelRotationTimeUpdate()">Cancel</button>
-                      <div class="or"></div>
-                      <button class="ui primary button active" (click)="saveRotationTime()">Save</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-12 mt-3 mb-3">
-              <div class="card">
-                <div class="card-header">Pools (last 3)</div>
-                <div class="card-body">
-                  <table class="ui striped table">
-                    <thead>
-                      <tr>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let pool of pastPools">
-                        <td data-label="StartDate">{{pool.startDate | date: 'short'}}</td>
-                        <td data-label="EndDate">{{pool.endDate | date: 'short'}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-8">
-          <div class="ui positive message" *ngIf="successMessage">
-            <i class="close icon"></i>
-            <div class="header">
-              {{successMessage}}
-            </div>
-          </div>
-          <div class="ui negative message" *ngIf="error">
-            <i class="close icon"></i>
-            <div class="header">
-              {{error.description}}
-            </div>
-            <p>
-              {{error.message}}
-            </p>
-          </div>
-          <div class="card">
-            <div class="card-header">Next Candidates</div>
-            <div class="card-body">
-              <table class="ui striped table">
-                <thead>
-                  <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email Address</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let candidate of candidates">
-                    <td data-label="FirstName">
-                      <i class="user icon"></i>
-                      {{candidate.firstName}}
-                    </td>
-                    <td data-label="LastName">{{candidate.lastName}}</td>
-                    <td data-label="EmailAddress">{{candidate.emailAddress}}</td>
-                    <td data-label="Actions">
-                      <i class="times circle icon hand-cursor mr-3" (click)="onDeleteUser(candidate)" data-toggle="tooltip" data-placement="bottom"
-                        title="Delete user"></i>
-                      <i class="edit circle icon hand-cursor" (click)="onEditUser(candidate)" data-toggle="tooltip" data-placement="bottom" title="Edit user"></i>
-                    </td>
-                  </tr>
-                </tbody>
-                <tfoot class="full-width">
-                  <tr>
-                    <th colspan="4">
-                      <div class="ui right floated small primary labeled icon button" data-toggle="modal" data-target="#newUserModal" (click)="onAddUser()">
-                        <i class="user icon"></i> Add User
-                      </div>
-                      <div>
-                        <div class="ui labeled button" tabindex="0">
-                          <div class="ui basic blue button">
-                            <i class="users icon"></i> Users
-                          </div>
-                          <a class="ui basic left pointing blue label">
-                            {{candidates.length}}
-                          </a>
-                        </div>
-                      </div>
-                    </th>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-          <div class="ui divider"></div>
-          <div>
-            <div class="ui left floated small primary labeled icon button" data-toggle="modal" data-target="#manualDesignationModal">
-              <i class="hand point right icon"></i> Designate Manually
-            </div>
-          </div>
-        </div>
+      <div class="col-lg-8">
+        <app-message></app-message>
+        <app-user></app-user>
+        <div class="ui divider"></div>
+        <app-rotation></app-rotation>
       </div>
     </div>
-    <!-- User Modal -->
-    <div class="modal fade" id="newUserModal" tabindex="-1" role="dialog" aria-labelledby="newUserModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="newUserModalLabel">Add New User</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form (ngSubmit)="saveUser()" [formGroup]="userForm">
-            <div class="modal-body">
-              <div class="form-row">
-                <input formControlName="id" type="hidden" id="id">
-                <div class="form-group col-md-6">
-                  <label for="firstNameInput">First Name</label>
-                  <input formControlName="firstName" class="form-control" id="firstNameInput" placeholder="First Name" required>
-                  <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)">
-                    <label *ngIf="firstName.errors.required" class="text-danger">First Name is required</label>
-                  </div>
-                </div>
-                <div class="form-group col-md-6">
-                  <label for="lastNameInput">Last Name</label>
-                  <input formControlName="lastName" class="form-control" id="lastNameInput" placeholder="Last Name" required>
-                  <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)">
-                    <label *ngIf="lastName.errors.required" class="text-danger">Last Name is required</label>
-                  </div>
-                </div>
-                <div class="form-group mb-2 col-md-12">
-                  <label for="lastNameInput">Email Address</label>
-                  <input formControlName="emailAddress" type="email" class="form-control" id="emailAddressInput" placeholder="Email Address"
-                    required>
-                  <div *ngIf="emailAddress.invalid && (emailAddress.dirty || emailAddress.touched)">
-                    <label *ngIf="emailAddress.errors.required" class="text-danger">Email address is required</label>
-                    <label *ngIf="emailAddress.errors.email" class="text-danger">Invalid email address</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="reset" class="btn btn-secondary">Clear</button>
-              <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">Save</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="confirmationModalLabel">Delete User</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p class="font-weight-bold" style="font-size: 16px;">
-              Do you really want to delete this user ?
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" (click)="deleteUser()">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Manual Designation Modal -->
-    <div class="modal fade" id="manualDesignationModal" tabindex="-1" role="dialog" aria-labelledby="manualDesignationModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="manualDesignationModalLabel">Designate User</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form [formGroup]="userSelectionForm" (ngSubmit)="designate()">
-            <div class="modal-body">
-              <label>Select User</label>
-              <select name="user" formControlName="userId" class="custom-select" (change)="onUserSelectionChange($event.target.value)">
-                <option *ngFor="let user of candidates" value="{{user.id}}">{{user.firstName}} {{user.lastName}}</option>
-              </select>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="onUserSelectionCanceled()">Cancel</button>
-              <button class="ui primary labeled icon button" [disabled]="!userSelectionForm.valid">
-                <i class="hand point right icon"></i>Designate
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    <p> &copy; MSL {{today | date: 'y'}}</p>
   </div>
