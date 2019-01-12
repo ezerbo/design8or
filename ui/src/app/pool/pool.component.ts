@@ -1,7 +1,7 @@
 declare var $: any;
 import { Component, OnInit } from '@angular/core';
 import { PoolService } from '../services/pool.service';
-import { Pools, User } from '../app.model';
+import { Pools, User, Pool } from '../app.model';
 import { MessageService } from '../services/message.service';
 import { UserService } from '../services/user.service';
 
@@ -37,6 +37,8 @@ export class PoolComponent implements OnInit {
 
     this.msg.userDeletionEventBus$.subscribe(user => { this.onUserDeletion(user) });
 
+    this.msg.poolStartEventBus$.subscribe((pool) => { this.onPoolStart(pool);})
+
     //TODO add user count to pools object
     this.userService.getAll().subscribe(users => { this.users = users });
   }
@@ -53,6 +55,11 @@ export class PoolComponent implements OnInit {
   onUserDeletion(user: User) {
     this.users = this.users.filter((u) => u.id != user.id);
     this.calculateProgress();
+  }
+
+  onPoolStart(pool: Pool) {//When a new pool starts
+    this.pools.currentPoolParticipantsCount = 0;
+    this.pools.current = pool;
   }
 
 }

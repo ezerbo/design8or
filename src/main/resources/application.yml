@@ -9,6 +9,7 @@ spring:
             hibernate.generate_statistics: false
         hibernate: 
             ddl-auto: create-drop
+  quartz:    jdbc:      initialize-schema: NEVER
    
   datasource:
         url: jdbc:h2:mem:desig8or_db;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=create schema if not exists desig8or_db;
@@ -19,4 +20,6 @@ spring:
 app:
   cors:
     allowed-origins:
-    - http://localhost:4200
+    - http://localhost:4200  keys:    subject: zerboedouard@gmail.com
+    public-key: BF_aZ-cmliVi5qbtxhGZrxxGZtEys0aLjZLhmtrboGtGiV__OxZa_emH2spKWNx8lZni_11a4oUJCfuEdT8x5rg
+    private-key: PyHDwHGKXXt5Ge9phcghR0TMo53ABZCIn2PpjcbWiuQ

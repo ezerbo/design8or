@@ -39,23 +39,29 @@ export class UserComponent implements OnInit {
     this.msg.designationEventBus$.subscribe(lead => {
       this.candidates = this.candidates.filter((c) => { return c.id != lead.id; });
     });
+    this.getCandidates();
   }
 
   ngOnInit() {
-    this.userService.getCandidates()
-      .subscribe(candidates => { this.candidates = candidates });
+    this.msg.designationEventBus$.subscribe(() => {
+      this.getCandidates();
+    });
   }
 
   designate() {
     this.designationService.designate(this.designatedUser)
       .subscribe(user => {
-        this.msg.emitDesignationEvent(user);
         this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
         $('#manualDesignationModal').modal('hide');
         this.msg.emitSuccessEvent('Lead successfully designated.');
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
       });
+  }
+
+  private getCandidates() {
+    this.userService.getCandidates()
+      .subscribe(candidates => { this.candidates = candidates });
   }
 
   saveUser() {
@@ -121,6 +127,10 @@ export class UserComponent implements OnInit {
 
   onAddUser() {
     this.userForm.reset();
+  }
+
+  onDesignate() {
+    this.userSelectionForm.reset();
   }
 
   onUserSelectionChange(userId: number) {

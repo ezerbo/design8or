@@ -3,6 +3,7 @@ package com.ss.design8or.service;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static com.ss.design8or.service.Design8orUtil.formatRotationTime;
 
 import java.time.LocalTime;
 
@@ -13,10 +14,13 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author ezerbo
  *
  */
+@Slf4j
 @Component
 public class RotationService {
 
@@ -35,7 +39,8 @@ public class RotationService {
 	}
 	
 	public void rescheduleRotation(LocalTime rotationTime) throws SchedulerException {
-		jobScheduler.rescheduleJob(new TriggerKey("rotationTrigger"), createTrigger(rotationTime));
+		log.info("Rescheduling rotation, setting time to '{}'", formatRotationTime(rotationTime));
+		jobScheduler.rescheduleJob(TriggerKey.triggerKey("rotationTrigger","design8orGroup"), createTrigger(rotationTime));
 	}
 	
 	private Trigger createTrigger(LocalTime rotationTime) {
@@ -43,6 +48,7 @@ public class RotationService {
 		String cronExpression = String.format("0 %s %s ? * * *",
 				rotationTime.getMinute(), rotationTime.getHour());
 		return newTrigger()
+				.forJob("rotationJob", "design8orGroup")
 				.withIdentity("rotationTrigger", "design8orGroup")
 				.withSchedule(cronSchedule(cronExpression))
 				.build();

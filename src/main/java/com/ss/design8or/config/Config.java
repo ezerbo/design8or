@@ -1,7 +1,10 @@
 package com.ss.design8or.config;
 
+import java.util.concurrent.Executor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,7 +23,7 @@ public class Config extends WebSecurityConfigurerAdapter {
 	public Config(ServiceProperties properties) {
 		this.config = properties.getCors();
 	}
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.httpBasic().disable()
@@ -32,7 +35,7 @@ public class Config extends WebSecurityConfigurerAdapter {
 		.csrf()
 		.disable();
 	}
-
+	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -47,6 +50,17 @@ public class Config extends WebSecurityConfigurerAdapter {
 		config.addExposedHeader("X-Total-Count");
 		source.registerCorsConfiguration("/**", config);
 		return source;
+	}
+	
+	@Bean
+	public Executor taskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(10);
+		executor.setMaxPoolSize(10);
+		executor.setQueueCapacity(30);
+		executor.setThreadNamePrefix("Notification-");
+		executor.initialize();
+		return executor;
 	}
 	
 }

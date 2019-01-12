@@ -2,7 +2,7 @@
   <div class="card-header">Pools</div>
   <div class="card-body">
     <div>
-      <label class="text-dark">Current Pool: Started on {{pools.current.startDate | date: 'shortDate'}}</label>
+      <label class="text-dark">Current Pool: Started on {{pools.current.startDate | date: 'short'}}</label>
       <div class="progress text-center" style="height: 30px;">
         <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0"
           aria-valuemax="100" [ngStyle]="{'width': pools.currentPoolProgress + '%'}">

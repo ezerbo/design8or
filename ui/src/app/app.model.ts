@@ -27,3 +27,10 @@ export interface Error {
 export interface Parameter {
     rotationTime: string;
 }
+
+export interface Subscription {
+    id?: number
+    endpoint: string
+    auth: string
+    p256dh: string
+}

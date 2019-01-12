@@ -8,6 +8,7 @@ export const environment = {
   userResource: 'http://localhost:8080/users',
   parameterResource: 'http://localhost:8080/parameters',
   designationResource: 'http://localhost:8080/designation',
+  subscriptionResource: 'http://localhost:8080/subscriptions',
   wsEndpoint: 'http://localhost:8080/ws'
 };
 

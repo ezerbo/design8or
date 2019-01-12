@@ -4,5 +4,6 @@ export const environment = {
   userResource: 'users',
   parameterResource: 'parameters',
   designationResource: 'designation',
+  subscriptionResource: 'subscriptions',
   wsEndpoint: 'ws'
 };

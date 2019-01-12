@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ss.design8or.model.User;
@@ -32,11 +33,15 @@ public class DesgnationServiceTests {
 	@Autowired
 	private AssignmentRepository assignmentRepository;
 	
+	@MockBean
+	private NotificationService notificationService;
+	
 	private DesignationService service;
 	
 	@Before
 	public void init() {
-		service = new DesignationService(poolRepository, userRepository, assignmentRepository);
+//		service = new DesignationService(poolRepository, userRepository,
+//				assignmentRepository, notificationService);
 	}
 	
 	@Test

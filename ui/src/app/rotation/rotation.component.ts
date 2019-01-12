@@ -18,15 +18,22 @@ export class RotationComponent implements OnInit {
 
   selectedTime: string;
 
+  countdown: string;
+
   constructor(
     private messageService: MessageService,
     private atp: AmazingTimePickerService,
     private parameterService: ParameterService
-  ){ }
+  ) { }
 
   ngOnInit() {
     this.parameterService.get()
-    .subscribe(parameter => { this.parameter = parameter });
+      .subscribe(parameter => {
+        this.parameter = parameter;
+        this.calculateTimeToDesignation();
+        setInterval(() => { this.calculateTimeToDesignation() }, 1000);
+      });
+    
   }
 
   saveRotationTime() {
@@ -54,6 +61,27 @@ export class RotationComponent implements OnInit {
       }
       this.selectedTime = selectedTime;
     });
+  }
+
+  private calculateTimeToDesignation() {
+    let now = moment(new Date(), 'HH:mm:ss');
+    let secondsToDesignation = 0;
+    let rotationTimeInSeconds = this.toSeconds(this.rotationTime());
+    let currentTimeInSeconds = this.toSeconds(now);
+    if (this.rotationTime().isAfter(now)) {
+      secondsToDesignation = rotationTimeInSeconds - currentTimeInSeconds;
+    } else {
+      secondsToDesignation = (86400 - currentTimeInSeconds) + rotationTimeInSeconds;
+    }
+    let days = Math.floor(secondsToDesignation / 86400);
+    let hours = Math.floor((secondsToDesignation % 86400) / 3600);
+    let minutes = Math.floor((secondsToDesignation % 86400) % 3600 / 60);
+    let seconds = ((secondsToDesignation % 86400) % 3600) % 60;
+    this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  toSeconds(time: moment.Moment) {
+    return time.hours() * 3600 + time.minutes() * 60 + time.seconds();
   }
 
 }

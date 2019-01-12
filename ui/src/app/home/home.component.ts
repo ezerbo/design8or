@@ -13,17 +13,28 @@ export class HomeComponent implements OnInit {
 
   today = new Date();
 
+  stompClient = Stomp.Stomp.over(new SockJS(environment.wsEndpoint));
+
   constructor(private msg: MessageService) {
-    let stompClient = Stomp.Stomp.over(new SockJS(environment.wsEndpoint));
-    stompClient.connect({}, () => {
-      stompClient.subscribe('/designations', (message) => {
+    this.stompClient.connect({}, () => {
+      this.stompClient.subscribe('/designations', (message) => {
         if (message) {
-          this.msg.emitDesignationEvent(JSON.parse(message.body));
+          this.msg.emitDesignationEvent(this.parseMessage(message));
         }
       });
+      this.stompClient.subscribe('/pools', (message) => {
+        if (message) {
+          this.msg.emitPoolStartEvent(this.parseMessage(message));
+        }
+      })
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
+
+  private parseMessage(message: any) {
+    return JSON.parse(message.body);
+  }
 
 }

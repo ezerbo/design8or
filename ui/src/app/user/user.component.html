@@ -28,7 +28,8 @@
       <tfoot class="full-width">
         <tr>
           <th colspan="4">
-            <div class="ui right floated small primary labeled icon button" data-toggle="modal" data-target="#manualDesignationModal">
+            <div class="ui right floated small primary labeled icon button" [ngClass]="{'disabled': candidates.length == 0}" 
+              data-toggle="modal" data-target="#manualDesignationModal" (click)="onDesignate()">
               <i class="hand point right icon"></i> Designate Manually
             </div>
             <div class="ui right floated small primary labeled icon button" data-toggle="modal" data-target="#newUserModal" (click)="onAddUser()">
@@ -36,7 +37,7 @@
             </div>
             <div class="ui labeled button" tabindex="0">
               <div class="ui basic blue button">
-                <i class="users icon"></i> Users
+                <i class="users icon"></i> Candidates
               </div>
               <a class="ui basic left pointing blue label">
                 {{candidates.length}}

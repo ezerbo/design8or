@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Error, User } from '../app.model';
+import { Error, User, Pool } from '../app.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export function processErrorResponse(errorResponse: HttpErrorResponse) {
@@ -35,6 +35,11 @@ export class MessageService {
   private userDeletionEvent = new Subject<User>();
 
   userDeletionEventBus$ = this.userDeletionEvent.asObservable();
+  
+
+  private poolStartEvent = new Subject<Pool>();
+
+  poolStartEventBus$ = this.poolStartEvent.asObservable();
 
   constructor() { }
 
@@ -56,6 +61,10 @@ export class MessageService {
 
   emitUserDeletiontionEvent(user: User) {
     this.userDeletionEvent.next(user);
+  }
+
+  emitPoolStartEvent(pool: Pool) {
+    this.poolStartEvent.next(pool);
   }
 
 }

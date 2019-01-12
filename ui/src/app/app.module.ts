@@ -14,6 +14,8 @@ import { PoolComponent } from './pool/pool.component';
 import { RotationComponent } from './rotation/rotation.component';
 import { MessageComponent } from './message/message.component';
 import { UserComponent } from './user/user.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
    declarations: [
@@ -32,7 +34,8 @@ import { UserComponent } from './user/user.component';
       AppRoutingModule,
       HttpClientModule,
       AmazingTimePickerModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
    ],
    providers: [
       DatePipe

@@ -16,10 +16,13 @@ import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author ezerbo
  *
  */
+@Slf4j
 @Service
 @Transactional
 public class DesignationService {
@@ -30,11 +33,14 @@ public class DesignationService {
 	
 	private AssignmentRepository assignmentRepository;
 	
+	private NotificationService notificationService;
+	
 	public DesignationService(PoolRepository poolRepository, UserRepository userRepository,
-			AssignmentRepository assignmentRepository) {
+			AssignmentRepository assignmentRepository, NotificationService notificationService) {
 		this.poolRepository = poolRepository;
 		this.userRepository = userRepository;
 		this.assignmentRepository = assignmentRepository;
+		this.notificationService = notificationService;
 	}
 	
 	/**
@@ -55,6 +61,7 @@ public class DesignationService {
 				.id(assignmentId)
 				.build();
 		assignmentRepository.save(assignment);
+		notificationService.emitDesignationEvent(user);
 		return user;
 	}
 	
@@ -62,16 +69,21 @@ public class DesignationService {
 	 * Designate new lead
 	 */
 	public User designate() {
+		log.info("Designating lead...");
 		List<User> candidates = userRepository.getAssignmentCandidates();
 		if(candidates.isEmpty()) {
+			log.info("Current pool ended, starting a new one");
 			poolRepository.findCurrent().map(pool -> poolRepository.save(pool.end()));//complete current pool
-			poolRepository.save(new Pool());//start new pool
+			Pool pool = poolRepository.save(new Pool());//start new pool
 			//Each user in the entire user base can be assigned a task
 			candidates = userRepository.findAll().stream()
 					.sorted((u, v) -> u.getLastName().compareTo(v.getLastName()))
 					.collect(Collectors.toList());
+			notificationService.notifyPoolCreation(pool);
 		}
-		return designate(candidates.get(0));
+		User lead = designate(candidates.get(0));
+		log.info("Designated lead: {}", lead.getEmailAddress());
+		return lead;
 	}
 	
 	private Pool getCurrentPool() {

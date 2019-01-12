@@ -12,11 +12,19 @@
 	<groupId>com.ss</groupId>
 	<artifactId>design8or</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>desig8or</name>
 	<description></description>
 
+	<inceptionYear>2019</inceptionYear>
+
 	<properties>
 		<java.version>1.8</java.version>
+		<front-end-plugin.version>1.6</front-end-plugin.version>
+		<npm.version>5.6.0</npm.version>
+		<node.version>v8.11.1</node.version>
+		<web-push.version>5.0.0</web-push.version>
+		<bouncy-castle.version>1.60</bouncy-castle.version>
 	</properties>
 
 	<dependencies>
@@ -51,6 +59,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>nl.martijndwars</groupId>
+			<artifactId>web-push</artifactId>
+			<version>${web-push.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bouncy-castle.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -104,7 +124,7 @@
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
 						<artifactId>frontend-maven-plugin</artifactId>
-						<version>${com.github.eirslett.front-end-plugin.version}</version>
+						<version>${front-end-plugin.version}</version>
 						<configuration>
 							<workingDirectory>${project.basedir}/ui</workingDirectory>
 							<installDirectory>temp</installDirectory>
