@@ -60,10 +60,11 @@ public class DesignationService {
 	 */
 	public User designate(User user) {
 		final long userId = user.getId();
-		designationRepository.findByCurrentTrue()
-			.map(d -> designationRepository.save(d.status(DesignationStatus.REASSIGNED).current(false)));
 		user = userRepository.findById(user.getId())
 				.orElseThrow(() -> new UserNotFoundException(userId));
+		designationRepository.findByCurrentTrue()
+			.map(d -> designationRepository.save(d.status(DesignationStatus.REASSIGNED).current(false)));
+		
 		Designation designation = Designation.builder().user(user).build();
 		designationRepository.save(designation);
 		notificationService.emitDesignationEvent(designation);
@@ -97,12 +98,15 @@ public class DesignationService {
 	private Assignment createAssignment(User user) {
 		userRepository.findByLeadTrue().map(u -> userRepository.save(u.lead(false)));
 		userRepository.save(user.lead(true));
+		Pool pool = getCurrentPool();
 		AssignmentId assignmentId = AssignmentId.builder()
-				.poolId(getCurrentPool().getId())
+				.poolId(pool.getId())
 				.userId(user.getId())
 				.build();
 		Assignment assignment = Assignment.builder()
 				.id(assignmentId)
+				.user(user)
+				.pool(pool)
 				.build();
 		return assignmentRepository.save(assignment);
 	}

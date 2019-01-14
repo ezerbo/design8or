@@ -29,25 +29,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "assignment", catalog = "desig8or_db")
 public class Assignment {
-
+	
 	@EmbeddedId
 	private AssignmentId id;
-
+	
 	@Temporal(TemporalType.DATE)
 	@Column(name = "assignment_date", nullable = false)
 	private Date assignmentDate;
-
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
 	private User user;
-
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "pool_id", nullable = false, insertable = false, updatable = false)
 	private Pool pool;
-
+	
 	@PrePersist
 	public void onSave() {
 		setAssignmentDate(new Date());
 	}
-
+	
 }

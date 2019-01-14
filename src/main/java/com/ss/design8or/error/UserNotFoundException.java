@@ -13,7 +13,7 @@ public class UserNotFoundException extends RuntimeException {
 	}
 	
 	public UserNotFoundException(String emailAddress) {
-		super(String.format("Not user found with email address: '{}'", emailAddress));
+		super(String.format("No user found with email address: '%s'", emailAddress));
 	}
 
 }

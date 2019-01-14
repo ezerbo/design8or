@@ -38,7 +38,7 @@ import lombok.ToString;
 @Table(name = "user", catalog = "desig8or_db",
 uniqueConstraints = { @UniqueConstraint(columnNames = "email_address") })
 public class User implements Serializable {
-
+	
 	private static final long serialVersionUID = 7758127706202666953L;
 
 	@Id
