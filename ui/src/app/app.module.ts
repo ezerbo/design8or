@@ -16,6 +16,10 @@ import { MessageComponent } from './message/message.component';
 import { UserComponent } from './user/user.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { ParameterComponent } from './parameter/parameter.component';
+import { DesignationCountdownComponent } from './designation-countdown/designation-countdown.component';
+import { DesignatedComponent } from './designated/designated.component';
+import { DesignationResponseComponent } from './designation-response/designation-response.component';
 
 @NgModule({
    declarations: [
@@ -26,7 +30,11 @@ import { environment } from '../environments/environment';
       PoolComponent,
       RotationComponent,
       MessageComponent,
-      UserComponent
+      UserComponent,
+      ParameterComponent,
+      DesignationCountdownComponent,
+      DesignatedComponent,
+      DesignationResponseComponent
    ],
    imports: [
       FormsModule,

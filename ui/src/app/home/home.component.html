@@ -1,7 +1,7 @@
-<div class="ui card" style="width: 80%; margin-left: auto; margin-right: auto;">
+<div class="ui card" style="width: 95%; margin-left: auto; margin-right: auto;">
   <div class="content">
     <h2 class="ui icon header">
-      <i class="hand point right outline icon"></i>
+      <i class="hand point right icon"></i>
       Design8or
     </h2>
     <div class="ui divider"></div>
@@ -11,6 +11,9 @@
           <div class="col-lg-12">
             <app-lead></app-lead>
           </div>
+          <div class="col-lg-12 mt-3">
+            <app-designated></app-designated>
+          </div>
           <div class="col-lg-12 mt-3 mb-3">
             <app-pool></app-pool>
           </div>
@@ -18,10 +21,20 @@
       </div>
       <div class="col-lg-8">
         <app-message></app-message>
-        <app-user></app-user>
+        <app-user *ngIf="!showParametersPanel"></app-user>
+        <app-parameter *ngIf="showParametersPanel"></app-parameter>
         <div class="ui divider"></div>
-        <app-rotation></app-rotation>
+        <div>
+          <button class="ui icon button primary labeled" (click)="onShowParameters()" *ngIf="!showParametersPanel">
+            <i class="icon settings"></i> Parameters
+          </button>
+          <button class="ui icon button primary labeled" (click)="onHideParameters()" *ngIf="showParametersPanel">
+            <i class="icon users"></i> Candidates
+          </button>
+        </div>
+        <!-- <app-rotation></app-rotation> -->
       </div>
     </div>
     <p> &copy; MSL {{today | date: 'y'}}</p>
   </div>
+</div>

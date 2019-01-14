@@ -37,11 +37,11 @@ public class Assignment {
 	@Column(name = "assignment_date", nullable = false)
 	private Date assignmentDate;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
 	private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "pool_id", nullable = false, insertable = false, updatable = false)
 	private Pool pool;
 

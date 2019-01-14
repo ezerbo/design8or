@@ -1,6 +1,6 @@
 <div *ngIf="parameter" class="mb-2" style="margin: auto; width: 100%">
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-4">
       <div class="ui right labeled button" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="Change rotation time"
         (click)="selectDesignationTime()">
         <div class="ui icon button primary">
@@ -8,13 +8,6 @@
         </div>
         <label class="ui basic label hand-cursor">Rotation: Everyday at {{rotationTime() | date: 'shortTime'}}</label>
       </div>
-      <div class="ui right labeled button">
-        <div class="ui icon button primary">
-          <i class="hourglass half icon"></i>
-        </div>
-        <label class="ui basic label hand-cursor">Next designation countdown: {{countdown}}</label>
-      </div>
-
     </div>
     <div class="col-lg-4">
       <div class="ui buttons" *ngIf="showRotationSaveBtn">

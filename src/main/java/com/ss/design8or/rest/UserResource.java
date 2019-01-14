@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.User;
+import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.UserRepository;
 
 /**
@@ -28,8 +29,12 @@ public class UserResource {
 
 	private UserRepository repository;
 	
-	public UserResource(UserRepository repository) {
+	private DesignationRepository designationRepository;
+	
+	public UserResource(UserRepository repository,
+			DesignationRepository designationRepository) {
 		this.repository = repository;
+		this.designationRepository = designationRepository;
 	}
 	
 	@GetMapping
@@ -43,9 +48,16 @@ public class UserResource {
 	}
 	
 	@GetMapping("/lead")
-	public ResponseEntity<User> getLead() {
+	public ResponseEntity<User> getLeadUser() {
 		return repository.findByLeadTrue()
 				.map(lead -> ResponseEntity.ok(lead))
+				.orElse(ResponseEntity.notFound().build());
+	}
+	
+	@GetMapping("/designated")
+	public ResponseEntity<User> getDesignatedUser() {
+		return designationRepository.findByCurrentTrue()
+				.map(d -> ResponseEntity.ok(d.getUser()))
 				.orElse(ResponseEntity.notFound().build());
 	}
 	

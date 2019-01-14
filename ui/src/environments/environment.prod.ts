@@ -3,7 +3,7 @@ export const environment = {
   poolResource: 'pools',
   userResource: 'users',
   parameterResource: 'parameters',
-  designationResource: 'designation',
+  designationResource: 'designations',
   subscriptionResource: 'subscriptions',
   wsEndpoint: 'ws'
 };

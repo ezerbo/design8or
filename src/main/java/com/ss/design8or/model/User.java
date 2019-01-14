@@ -33,8 +33,8 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"assignments"})
-@EqualsAndHashCode(exclude = {"assignments"})
+@ToString(exclude = {"assignments", "designations"})
+@EqualsAndHashCode(exclude = {"assignments", "designations"})
 @Table(name = "user", catalog = "desig8or_db",
 uniqueConstraints = { @UniqueConstraint(columnNames = "email_address") })
 public class User implements Serializable {
@@ -59,15 +59,18 @@ public class User implements Serializable {
 	private String emailAddress;
 	
 	@Column(name = "is_lead")
-	public boolean lead;
+	public boolean lead; //TODO use assignment status to determine lead.
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Assignment> assignments;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", orphanRemoval = true)
+	private List<Designation> designations;
+	
 	public User lead(boolean lead) {
 		setLead(lead);
 		return this;
 	}
-	
 }

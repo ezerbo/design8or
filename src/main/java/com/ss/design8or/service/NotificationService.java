@@ -17,6 +17,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.design8or.config.Constants;
 import com.ss.design8or.config.ServiceProperties;
+import com.ss.design8or.model.Assignment;
+import com.ss.design8or.model.Designation;
 import com.ss.design8or.model.KeysConfig;
 import com.ss.design8or.model.NotificationData;
 import com.ss.design8or.model.NotificationPayload;
@@ -41,14 +43,18 @@ public class NotificationService {
 	
 	private PushService pushService;
 	
+	private MailService mailService;
+	
 	private ObjectMapper objectMapper;
 	
 	private SimpMessagingTemplate messagingTemplate;
 	
 	private SubscriptionRepository subscriptionRepository;
 	
-	public NotificationService(SimpMessagingTemplate messagingTemplate, ObjectMapper objectMapper,
-			SubscriptionRepository subscriptionRepository, ServiceProperties properties) {
+	public NotificationService(MailService mailService, SimpMessagingTemplate messagingTemplate,
+			ObjectMapper objectMapper, SubscriptionRepository subscriptionRepository,
+			ServiceProperties properties) {
+		this.mailService = mailService;
 		this.keys = properties.getKeys();
 		this.objectMapper = objectMapper;
 		this.messagingTemplate = messagingTemplate;
@@ -61,23 +67,47 @@ public class NotificationService {
 		pushService = new PushService(keys.getPublicKey(), keys.getPrivateKey(), keys.getSubject());
 	}
 	
+	/**
+	 * @param lead User designated
+	 * @param userResponseUrl URL to UI where user will accept or deny designation
+	 */
 	@Async
-	public void emitDesignationEvent(User lead) {
-		sendDesignationEventAsPushNotification(lead); //Broadcast event
-		sendDesignationEventAsWebSocketMessage(lead);
+	public void emitDesignationEvent(Designation designation) {
+		mailService.sendDesignationEventAsEmail(designation.getUser());
+		sendDesignationEventAsWebSocketMessage(designation);
 	}
 	
-	public void sendDesignationEventAsWebSocketMessage(User lead) {
-		messagingTemplate.convertAndSend(Constants.DESIGNATION_NSCHANNEL, lead);
+	@Async
+	public void emitDesignationDeclinationEvent(Designation designation) {
+		//sendAssignmentEventAsWebSocketMessage(assignment);
+		//TODO broadcast to all user but the one who declined
 	}
 	
-	public void notifyPoolCreation(Pool pool) {
+	@Async
+	public void emitAssignmentEvent(Assignment assignment) {
+		sendAssignmentEventAsWebSocketMessage(assignment);
+		sendAssignmentEventAsPushNotification(assignment.getUser());
+	}
+	
+	@Async
+	private void sendAssignmentEventAsWebSocketMessage(Assignment assignment) {
+		messagingTemplate.convertAndSend(Constants.ASSIGNMENT_NSCHANNEL, assignment);
+	}
+	
+	@Async
+	private void sendDesignationEventAsWebSocketMessage(Designation designation) {
+		messagingTemplate.convertAndSend(Constants.DESIGNATION_NSCHANNEL, designation);
+	}
+	
+	@Async
+	public void sendPoolCreationEventAsWebSocketMessage(Pool pool) {
 		messagingTemplate.convertAndSend(Constants.POOL_NS_CHANNEL, pool);
 	}
 
-	public void sendDesignationEventAsPushNotification(User lead) {
+	@Async
+	private void sendAssignmentEventAsPushNotification(User lead) {
 		subscriptionRepository.findAll().stream()
-			.map(s -> toNotification(s, getDesignationEventPayload(lead)))
+			.map(s -> toNotification(s, getAssignmentEventPayload(lead)))
 			.forEach(s -> sendAsync(s));
 	}
 
@@ -98,7 +128,7 @@ public class NotificationService {
 		}
 	}
 	
-	private String getDesignationEventPayload(User lead) {
+	private String getAssignmentEventPayload(User lead) {
 		String designationPayload = null;
 		NotificationData data = NotificationData.builder()
 				.dateOfArrival(LocalDateTime.now())

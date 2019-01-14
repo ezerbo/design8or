@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.ss.design8or.model.KeysConfig;
+import com.ss.design8or.model.MailConfig;
 
 import lombok.Data;
 
@@ -14,6 +15,8 @@ import lombok.Data;
 @Data
 @ConfigurationProperties(prefix = "app")
 public class ServiceProperties {
+	
+	private MailConfig mail = new MailConfig();
 	
 	private KeysConfig keys = new KeysConfig();
 	

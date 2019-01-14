@@ -1,0 +1,13 @@
+<div class="card" *ngIf="designation">
+  <div class="card-header">Designated</div>
+  <div class="card-body">
+    <label>First Name: {{designation.user.firstName}}</label>
+    <br>
+    <label>Last Name: {{designation.user.lastName}}</label>
+    <br>
+    <label>Email Address: {{designation.user.emailAddress}}</label>
+  </div>
+  <div class="card-footer">
+    <label>Status: {{designation.status}}</label>
+  </div>
+</div>

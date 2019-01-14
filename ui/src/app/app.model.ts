@@ -34,3 +34,23 @@ export interface Subscription {
     auth: string
     p256dh: string
 }
+
+export interface Designation {
+    id: number
+    status: string
+    designationDate: Date;
+    current: boolean
+    user: User
+}
+
+export interface Assignment {
+    id: number
+    assignmentDate: Date
+    user: User
+    pool: Pool
+}
+
+export interface DesignationResponse {
+    token: string
+    response: string
+}

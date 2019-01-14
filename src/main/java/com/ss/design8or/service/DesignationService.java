@@ -1,18 +1,27 @@
 package com.ss.design8or.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Service;
 
+import com.ss.design8or.error.DesignationNotFoundException;
+import com.ss.design8or.error.InvalidDesignationResponseException;
+import com.ss.design8or.error.UserNotFoundException;
 import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.AssignmentId;
+import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.DesignationResponse;
+import com.ss.design8or.model.DesignationStatus;
 import com.ss.design8or.model.Pool;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.AssignmentRepository;
+import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
 
@@ -28,19 +37,21 @@ import lombok.extern.slf4j.Slf4j;
 public class DesignationService {
 	
 	private PoolRepository poolRepository;
-	
 	private UserRepository userRepository;
-	
+	private DesignationRepository designationRepository;
+	private NotificationService notificationService;
+	private BasicTextEncryptor basicTextEncryptor;
 	private AssignmentRepository assignmentRepository;
 	
-	private NotificationService notificationService;
-	
 	public DesignationService(PoolRepository poolRepository, UserRepository userRepository,
-			AssignmentRepository assignmentRepository, NotificationService notificationService) {
+			DesignationRepository designationRepository, NotificationService notificationService,
+			AssignmentRepository assignmentRepository, BasicTextEncryptor basicTextEncryptor) {
 		this.poolRepository = poolRepository;
 		this.userRepository = userRepository;
-		this.assignmentRepository = assignmentRepository;
+		this.designationRepository = designationRepository;
 		this.notificationService = notificationService;
+		this.assignmentRepository = assignmentRepository;
+		this.basicTextEncryptor = basicTextEncryptor;
 	}
 	
 	/**
@@ -48,11 +59,44 @@ public class DesignationService {
 	 * @param user
 	 */
 	public User designate(User user) {
-		userRepository.findByLeadTrue().map(u -> userRepository.save(u.lead(false)));
+		final long userId = user.getId();
+		designationRepository.findByCurrentTrue()
+			.map(d -> designationRepository.save(d.status(DesignationStatus.REASSIGNED).current(false)));
 		user = userRepository.findById(user.getId())
-			.orElseThrow(() -> new RuntimeException()); //TODO throw user-not-found exception
-		user.setLead(true);
-		userRepository.save(user);
+				.orElseThrow(() -> new UserNotFoundException(userId));
+		Designation designation = Designation.builder().user(user).build();
+		designationRepository.save(designation);
+		notificationService.emitDesignationEvent(designation);
+		return user;
+	}
+	
+	public Designation processDesignationResponse(DesignationResponse designationResponse) {
+		log.info("Processing designation response");
+		validateResponse(designationResponse.getResponse());
+		String emailAddress = basicTextEncryptor.decrypt(designationResponse.getToken());
+		User user = userRepository.findByEmailAddress(emailAddress)
+				.orElseThrow(() -> new UserNotFoundException(emailAddress));
+		Designation designation = user.getDesignations().stream()
+				.filter(d -> d.isCurrent()).findAny()
+				.orElse(designationRepository.findCurrentAndDeclined()); //If user has not been designated, find a designation that's current and has been declined
+		if(Objects.isNull(designation)) {
+			throw new DesignationNotFoundException();
+		}
+		
+		if("accept".equalsIgnoreCase(designationResponse.getResponse())) {
+			designation.current(false).status(DesignationStatus.ACCPTED);//
+			Assignment assignment = createAssignment(user);
+			notificationService.emitAssignmentEvent(assignment);
+		} else {
+			designation.status(DesignationStatus.DECLINED);
+			notificationService.emitDesignationDeclinationEvent(designation);//Broadcast to all users
+		}
+		return designationRepository.save(designation);
+	}
+	
+	private Assignment createAssignment(User user) {
+		userRepository.findByLeadTrue().map(u -> userRepository.save(u.lead(false)));
+		userRepository.save(user.lead(true));
 		AssignmentId assignmentId = AssignmentId.builder()
 				.poolId(getCurrentPool().getId())
 				.userId(user.getId())
@@ -60,9 +104,7 @@ public class DesignationService {
 		Assignment assignment = Assignment.builder()
 				.id(assignmentId)
 				.build();
-		assignmentRepository.save(assignment);
-		notificationService.emitDesignationEvent(user);
-		return user;
+		return assignmentRepository.save(assignment);
 	}
 	
 	/**
@@ -79,7 +121,7 @@ public class DesignationService {
 			candidates = userRepository.findAll().stream()
 					.sorted((u, v) -> u.getLastName().compareTo(v.getLastName()))
 					.collect(Collectors.toList());
-			notificationService.notifyPoolCreation(pool);
+			notificationService.sendPoolCreationEventAsWebSocketMessage(pool);
 		}
 		User lead = designate(candidates.get(0));
 		log.info("Designated lead: {}", lead.getEmailAddress());
@@ -92,6 +134,12 @@ public class DesignationService {
 			return poolOp.get();
 		}
 		return poolRepository.save(new Pool());
+	}
+	
+	private void validateResponse(String response) {
+		if(!("accept".equalsIgnoreCase(response) || "decline".equalsIgnoreCase(response))) {
+			throw new InvalidDesignationResponseException(response);
+		}
 	}
 	
 }

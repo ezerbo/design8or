@@ -4,6 +4,7 @@ import { PoolService } from '../services/pool.service';
 import { Pools, User, Pool } from '../app.model';
 import { MessageService } from '../services/message.service';
 import { UserService } from '../services/user.service';
+import { DesignationService } from '../services/designation.service';
 
 @Component({
   selector: 'app-pool',
@@ -19,7 +20,7 @@ export class PoolComponent implements OnInit {
   constructor(
     private userService: UserService,
     private poolService: PoolService,
-    private msg: MessageService,
+    private designationService: DesignationService,
   ) { $('#poolProgress').progress(); }
 
   ngOnInit() {
@@ -28,16 +29,16 @@ export class PoolComponent implements OnInit {
         this.pools = pools;
       });
 
-    this.msg.designationEventBus$.subscribe(() => {
-      this.pools.currentPoolParticipantsCount += 1;
-      this.calculateProgress();
-    });
+    // this.designationService.designationEventBus$.subscribe(() => {
+    //   this.pools.currentPoolParticipantsCount += 1;
+    //   this.calculateProgress();
+    // });
 
-    this.msg.userAdditionEventBus$.subscribe(user => { this.onUserAddition(user) });
+    this.userService.userAdditionEventBus$.subscribe(user => { this.onUserAddition(user) });
 
-    this.msg.userDeletionEventBus$.subscribe(user => { this.onUserDeletion(user) });
+    this.userService.userDeletionEventBus$.subscribe(user => { this.onUserDeletion(user) });
 
-    this.msg.poolStartEventBus$.subscribe((pool) => { this.onPoolStart(pool);})
+    this.poolService.poolStartEventBus$.subscribe((pool) => { this.onPoolStart(pool) })
 
     //TODO add user count to pools object
     this.userService.getAll().subscribe(users => { this.users = users });

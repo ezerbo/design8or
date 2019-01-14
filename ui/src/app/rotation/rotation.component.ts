@@ -4,6 +4,7 @@ import { AmazingTimePickerService } from 'amazing-time-picker';
 import { ParameterService } from '../services/parameter.service';
 import { Parameter } from '../app.model';
 import { MessageService } from '../services/message.service';
+import { RotationService } from '../services/rotation.service';
 
 @Component({
   selector: 'app-rotation',
@@ -12,17 +13,16 @@ import { MessageService } from '../services/message.service';
 })
 export class RotationComponent implements OnInit {
 
+  selectedTime: string;
+
   parameter: Parameter;
 
   showRotationSaveBtn = false;
 
-  selectedTime: string;
-
-  countdown: string;
-
   constructor(
-    private messageService: MessageService,
+    private msg: MessageService,
     private atp: AmazingTimePickerService,
+    private rotationService: RotationService,
     private parameterService: ParameterService
   ) { }
 
@@ -30,10 +30,7 @@ export class RotationComponent implements OnInit {
     this.parameterService.get()
       .subscribe(parameter => {
         this.parameter = parameter;
-        this.calculateTimeToDesignation();
-        setInterval(() => { this.calculateTimeToDesignation() }, 1000);
       });
-    
   }
 
   saveRotationTime() {
@@ -41,7 +38,8 @@ export class RotationComponent implements OnInit {
     this.parameterService.update(this.parameter)
       .subscribe(() => {
         this.showRotationSaveBtn = false;
-        this.messageService.emitSuccessEvent('Rotation time successfully updated.');
+        this.msg.emitSuccessEvent('Rotation time successfully updated.');
+        this.rotationService.emitRotationTimeUpdateEvent(this.selectedTime);
       });
   }
 
@@ -56,32 +54,11 @@ export class RotationComponent implements OnInit {
   selectDesignationTime() {
     const amazingTimePicker = this.atp.open({ time: this.parameter.rotationTime });
     amazingTimePicker.afterClose().subscribe(selectedTime => {
-      if (this.parameter.rotationTime.substring(0, 5) != selectedTime) {
+      if (this.parameter.rotationTime.substring(0, 5) != selectedTime) { //When trigger time is updated
         this.showRotationSaveBtn = true;
       }
       this.selectedTime = selectedTime;
     });
-  }
-
-  private calculateTimeToDesignation() {
-    let now = moment(new Date(), 'HH:mm:ss');
-    let secondsToDesignation = 0;
-    let rotationTimeInSeconds = this.toSeconds(this.rotationTime());
-    let currentTimeInSeconds = this.toSeconds(now);
-    if (this.rotationTime().isAfter(now)) {
-      secondsToDesignation = rotationTimeInSeconds - currentTimeInSeconds;
-    } else {
-      secondsToDesignation = (86400 - currentTimeInSeconds) + rotationTimeInSeconds;
-    }
-    let days = Math.floor(secondsToDesignation / 86400);
-    let hours = Math.floor((secondsToDesignation % 86400) / 3600);
-    let minutes = Math.floor((secondsToDesignation % 86400) % 3600 / 60);
-    let seconds = ((secondsToDesignation % 86400) % 3600) % 60;
-    this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }
-
-  toSeconds(time: moment.Moment) {
-    return time.hours() * 3600 + time.minutes() * 60 + time.seconds();
   }
 
 }

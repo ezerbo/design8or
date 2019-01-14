@@ -7,7 +7,7 @@ export const environment = {
   poolResource: 'http://localhost:8080/pools',
   userResource: 'http://localhost:8080/users',
   parameterResource: 'http://localhost:8080/parameters',
-  designationResource: 'http://localhost:8080/designation',
+  designationResource: 'http://localhost:8080/designations',
   subscriptionResource: 'http://localhost:8080/subscriptions',
   wsEndpoint: 'http://localhost:8080/ws'
 };

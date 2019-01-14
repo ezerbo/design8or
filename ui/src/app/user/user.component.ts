@@ -36,23 +36,21 @@ export class UserComponent implements OnInit {
     private designationService: DesignationService,
     private msg: MessageService) {
     $(() => { $('[data-toggle="tooltip"]').tooltip(); });
-    this.msg.designationEventBus$.subscribe(lead => {
-      this.candidates = this.candidates.filter((c) => { return c.id != lead.id; });
-    });
-    this.getCandidates();
+    this.designationService.designationEventBus$.subscribe(() => { this.getCandidates() });
   }
 
   ngOnInit() {
-    this.msg.designationEventBus$.subscribe(() => {
-      this.getCandidates();
-    });
+    this.getCandidates();
+    // this.designationService.designationEventBus$.subscribe(() => {
+    //   this.getCandidates();
+    // });
   }
 
   designate() {
     this.designationService.designate(this.designatedUser)
       .subscribe(user => {
-        this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
         $('#manualDesignationModal').modal('hide');
+        //this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
         this.msg.emitSuccessEvent('Lead successfully designated.');
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
@@ -60,8 +58,12 @@ export class UserComponent implements OnInit {
   }
 
   private getCandidates() {
+    console.log('getting all candidates')
     this.userService.getCandidates()
-      .subscribe(candidates => { this.candidates = candidates });
+      .subscribe(candidates => {
+        this.candidates = [];
+        this.candidates = candidates;
+      });
   }
 
   saveUser() {
@@ -79,7 +81,7 @@ export class UserComponent implements OnInit {
         this.candidates.push(u);
         this.candidates = this.candidates.slice();
         $('#newUserModal').modal('hide');
-        this.msg.emitUserAddtionEvent(user);
+        this.userService.emitUserAddtionEvent(user);
         this.msg.emitSuccessEvent('User successfully created.');
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
@@ -111,7 +113,7 @@ export class UserComponent implements OnInit {
       .subscribe(() => {
         this.candidates = this.candidates.filter((c) => { return c.id != this.currentCandidate.id; });
         $('#confirmationModal').modal('hide');
-        this.msg.emitUserDeletiontionEvent(this.currentCandidate);
+        this.userService.emitUserDeletiontionEvent(this.currentCandidate);
         this.msg.emitSuccessEvent('User successfully deleted.');
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
