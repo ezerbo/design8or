@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap, map } from 'rxjs/operators';
 import { DesignationService } from '../services/designation.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AssignmentService } from '../services/assignment.service';
-import { DesignationResponse } from '../app.model';
+import { DesignationResponse, Designation, Error } from '../app.model';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-designation-response',
@@ -13,21 +12,31 @@ import { DesignationResponse } from '../app.model';
 })
 export class DesignationResponseComponent implements OnInit {
 
+  error: Error;
+  designation: Designation;
 
   constructor(
     private route: ActivatedRoute,
-    private assignmentService: AssignmentService,
+    private spinner: NgxSpinnerService,
     private designationService: DesignationService
   ) { }
 
   ngOnInit() {
+    this.spinner.show();
     this.route.queryParamMap.subscribe(params => {
-      let response: DesignationResponse = { token: params.get('token'), response: params.get('response') }
+      let response: DesignationResponse = {
+        token: params.get('token'),
+        response: params.get('response'),
+        emailAddress: params.get('email')
+      }
       this.designationService.processDesignationResponse(response)
-        .subscribe(() => { console.log('designation successfully processed') });
-    });
-    this.assignmentService.assignmentEventBus$.subscribe(() => {
-      console.log('User accepted designation');
+        .subscribe(designation => {
+          this.designation = designation;
+          this.spinner.hide();
+        }, (err: HttpErrorResponse) => {
+          this.error = err.error;
+          this.spinner.hide();
+        });
     });
   }
 

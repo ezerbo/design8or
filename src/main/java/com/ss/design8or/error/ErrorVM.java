@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ErrorVM {
 
-	private String descripton;
+	private String description;
 	
 	private String message;
 }

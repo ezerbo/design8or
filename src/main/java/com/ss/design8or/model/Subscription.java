@@ -30,12 +30,12 @@ public class Subscription {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "endpoint", unique = true, nullable = false)
+	@Column(name = "endpoint", nullable = false)
 	private String endpoint;
 
-	@Column(name = "auth", unique = true, nullable = false)
+	@Column(name = "auth", nullable = false)
 	private String auth;
 
-	@Column(name = "p256dh", unique = true, nullable = false)
+	@Column(name = "p256dh", nullable = false)
 	private String p256dh;
 }

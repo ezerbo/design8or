@@ -56,7 +56,7 @@ public class UserResource {
 	
 	@GetMapping("/designated")
 	public ResponseEntity<User> getDesignatedUser() {
-		return designationRepository.findByCurrentTrue()
+		return designationRepository.findCurrent()
 				.map(d -> ResponseEntity.ok(d.getUser()))
 				.orElse(ResponseEntity.notFound().build());
 	}

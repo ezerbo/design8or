@@ -23,7 +23,7 @@ public class ErrorTranslator {
 		ex.printStackTrace();
 		return new ResponseEntity<>(
 				ErrorVM.builder()
-				.descripton("Unable to process request")
+				.description("Unable to process request")
 				.message(ex.getMessage())
 				.build(),
 				HttpStatus.INTERNAL_SERVER_ERROR);

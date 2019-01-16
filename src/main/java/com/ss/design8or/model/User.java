@@ -69,8 +69,13 @@ public class User implements Serializable {
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Designation> designations;
 	
-	public User lead(boolean lead) {
-		setLead(lead);
+	public User elect() {
+		setLead(true);
+		return this;
+	}
+	
+	public User unelect() {
+		setLead(false);
 		return this;
 	}
 }

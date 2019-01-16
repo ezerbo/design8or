@@ -2,9 +2,8 @@ declare var $: any;
 import { Component, OnInit } from '@angular/core';
 import { PoolService } from '../services/pool.service';
 import { Pools, User, Pool } from '../app.model';
-import { MessageService } from '../services/message.service';
 import { UserService } from '../services/user.service';
-import { DesignationService } from '../services/designation.service';
+import { AssignmentService } from '../services/assignment.service';
 
 @Component({
   selector: 'app-pool',
@@ -20,19 +19,17 @@ export class PoolComponent implements OnInit {
   constructor(
     private userService: UserService,
     private poolService: PoolService,
-    private designationService: DesignationService,
+    private assignmentService: AssignmentService,
   ) { $('#poolProgress').progress(); }
 
   ngOnInit() {
     this.poolService.getAll()
-      .subscribe(pools => {
-        this.pools = pools;
-      });
+      .subscribe(pools => { this.pools = pools });
 
-    // this.designationService.designationEventBus$.subscribe(() => {
-    //   this.pools.currentPoolParticipantsCount += 1;
-    //   this.calculateProgress();
-    // });
+    this.assignmentService.assignmentEventBus$.subscribe(() => {
+      this.pools.currentPoolParticipantsCount += 1;
+      this.calculateProgress();
+    });
 
     this.userService.userAdditionEventBus$.subscribe(user => { this.onUserAddition(user) });
 

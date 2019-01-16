@@ -53,4 +53,12 @@ export interface Assignment {
 export interface DesignationResponse {
     token: string
     response: string
+    emailAddress: string
+}
+
+export const WSEndpoint = {
+    pools: '/pools',
+    designations: '/designations',
+    assignments: '/assignments',
+    parameters: '/parameters'
 }

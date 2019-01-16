@@ -14,8 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DesignationResponse {
-
+	
 	private String token;
 	
 	private String response;
+	
+	private String emailAddress;
 }

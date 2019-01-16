@@ -3,13 +3,14 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AmazingTimePickerModule } from 'amazing-time-picker';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { HomeComponent } from './home/home.component';
 import { AppRoutingModule } from './app.routes';
 import { DatePipe } from '@angular/common';
-import { LeadComponent } from './lead/lead.component';
+import { LeadUserComponent } from './lead-user/lead-user.component';
 import { PoolComponent } from './pool/pool.component';
 import { RotationComponent } from './rotation/rotation.component';
 import { MessageComponent } from './message/message.component';
@@ -18,7 +19,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { ParameterComponent } from './parameter/parameter.component';
 import { DesignationCountdownComponent } from './designation-countdown/designation-countdown.component';
-import { DesignatedComponent } from './designated/designated.component';
+import { DesignatedUserComponent } from './designated-user/designated-user.component';
 import { DesignationResponseComponent } from './designation-response/designation-response.component';
 
 @NgModule({
@@ -26,14 +27,14 @@ import { DesignationResponseComponent } from './designation-response/designation
       AppComponent,
       PageNotFoundComponent,
       HomeComponent,
-      LeadComponent,
+      LeadUserComponent,
       PoolComponent,
       RotationComponent,
       MessageComponent,
       UserComponent,
       ParameterComponent,
       DesignationCountdownComponent,
-      DesignatedComponent,
+      DesignatedUserComponent,
       DesignationResponseComponent
    ],
    imports: [
@@ -41,6 +42,7 @@ import { DesignationResponseComponent } from './designation-response/designation
       BrowserModule,
       AppRoutingModule,
       HttpClientModule,
+      NgxSpinnerModule,
       AmazingTimePickerModule,
       ReactiveFormsModule,
       ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })

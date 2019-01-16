@@ -42,8 +42,8 @@ public class DesignationResource {
 	}
 	
 	@GetMapping("/current")
-	public ResponseEntity<Designation> findPending() {
-		return repository.findByCurrentTrue()
+	public ResponseEntity<Designation> findCurrent() {
+		return repository.findCurrent()
 					.map(d -> ResponseEntity.ok(d))
 					.orElse(ResponseEntity.notFound().build());
 	}

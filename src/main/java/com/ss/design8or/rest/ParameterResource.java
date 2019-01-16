@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ss.design8or.model.Parameter;
 import com.ss.design8or.repository.ParameterRepository;
 import com.ss.design8or.service.RotationService;
+import com.ss.design8or.service.notification.NotificationService;
 
 /**
  * @author ezerbo
@@ -24,13 +25,14 @@ import com.ss.design8or.service.RotationService;
 public class ParameterResource {
 
 	private ParameterRepository repository;
-	
 	private RotationService rotationService;
+	private NotificationService notificationService;
 
 	public ParameterResource(ParameterRepository repository,
-			RotationService rotationService) {
+			RotationService rotationService, NotificationService notificationService) {
 		this.repository = repository;
 		this.rotationService = rotationService;
+		this.notificationService = notificationService;
 	}
 
 	@GetMapping
@@ -51,6 +53,7 @@ public class ParameterResource {
 		}
 		parameter = repository.save(parameter);
 		rotationService.rescheduleRotation(parameter.getRotationTime());
+		notificationService.emitParametersUpdateEvent(parameter);
 		return ResponseEntity.ok(parameter);
 	}
 	

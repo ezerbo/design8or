@@ -1,10 +1,9 @@
-package com.ss.design8or.service;
+package com.ss.design8or.service.notification;
 import java.time.LocalDate;
 
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.codec.CharEncoding;
-import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -13,8 +12,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import com.ss.design8or.config.ServiceProperties;
+import com.ss.design8or.model.Designation;
 import com.ss.design8or.model.MailConfig;
-import com.ss.design8or.model.User;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,30 +29,25 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class MailService {
+class EmailNotificationService {
 
     private static final String USER = "user";
     private static final String DESIGNATION_RESPONSE_URL = "reponseUrl";
     private static final String YEAR = "year";
-
+    
     private ServiceProperties properties;
     private JavaMailSenderImpl javaMailSender;
     private SpringTemplateEngine templateEngine;
-    private BasicTextEncryptor basicTextEncryptor;
     
-    public MailService(ServiceProperties properties, JavaMailSenderImpl javaMailSender,
-    		SpringTemplateEngine templateEngine, BasicTextEncryptor basicTextEncryptor) {
+    public EmailNotificationService(ServiceProperties properties, JavaMailSenderImpl javaMailSender,
+    		SpringTemplateEngine templateEngine) {
     	this.javaMailSender = javaMailSender;
     	this.templateEngine = templateEngine;
     	this.properties = properties;
-    	this.basicTextEncryptor = basicTextEncryptor;
 	}
-
+    
     @Async
-    public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
-        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart, isHtml, to, subject, content);
-        // Prepare message using a Spring helper
+    private void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
@@ -67,26 +61,23 @@ public class MailService {
             log.warn("E-mail could not be sent to user '{}'", to, e);
         }
     }
-
+    
     @Async
-    public void sendDesignationEventAsEmail(User user) {
-        log.debug("Sending activation e-mail to '{}'", user.getEmailAddress());
+    public void sendDesignationEvent(Designation designation) {
         Context context = new Context();
-        context.setVariable(USER, user);
-        String designationResponseUrl = computeDesignationResponseUrl(user.getEmailAddress());
-        context.setVariable(DESIGNATION_RESPONSE_URL, designationResponseUrl);
+        context.setVariable(USER, designation.getUser());
+        context.setVariable(DESIGNATION_RESPONSE_URL, computeDesignationResponseUrl(designation));
         context.setVariable(YEAR, LocalDate.now().getYear());
         String content = templateEngine.process("designation-email", context);
         String subject = properties.getMail().getDesignationEmailSubject();
-        sendEmail(user.getEmailAddress(), subject, content, false, true);
+        sendEmail(designation.getUser().getEmailAddress(), subject, content, false, true);
     }
     
-    private String computeDesignationResponseUrl(String emailAddress) {
+    private String computeDesignationResponseUrl(Designation designation) {
     	MailConfig mailConfig = properties.getMail();
     	String responseBaseUrl = mailConfig.getDesignationResponseBaseUrl();
-    	//designated or there's declined designation.
-    	String encryptedEmail = basicTextEncryptor.encrypt(emailAddress);
-    	return String.format("%s/designation-response?token=%s", responseBaseUrl, encryptedEmail);
+    	return String.format("%s/designation-response?token=%s&email=%s", responseBaseUrl,
+    			designation.getToken(), designation.getUser().getEmailAddress());
     }
-
+    
 }

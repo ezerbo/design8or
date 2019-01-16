@@ -6,6 +6,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { DesignationService } from '../services/designation.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService, processErrorResponse } from '../services/message.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-user',
@@ -15,9 +16,7 @@ import { MessageService, processErrorResponse } from '../services/message.servic
 export class UserComponent implements OnInit {
 
   designatedUser: User;
-
   currentCandidate: User;
-
   candidates: User[] = [];
 
   userSelectionForm = new FormGroup({
@@ -32,33 +31,33 @@ export class UserComponent implements OnInit {
     lead: new FormControl('')
   });
 
-  constructor(private userService: UserService,
-    private designationService: DesignationService,
-    private msg: MessageService) {
+  constructor(
+    private msg: MessageService,
+    private userService: UserService,
+    private spinner: NgxSpinnerService,
+    private designationService: DesignationService) {
     $(() => { $('[data-toggle="tooltip"]').tooltip(); });
-    this.designationService.designationEventBus$.subscribe(() => { this.getCandidates() });
   }
 
   ngOnInit() {
     this.getCandidates();
-    // this.designationService.designationEventBus$.subscribe(() => {
-    //   this.getCandidates();
-    // });
+    this.designationService.designationEventBus$.subscribe(() => { this.getCandidates() });
   }
 
   designate() {
+    this.spinner.show();
     this.designationService.designate(this.designatedUser)
-      .subscribe(user => {
+      .subscribe(() => {
         $('#manualDesignationModal').modal('hide');
-        //this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
         this.msg.emitSuccessEvent('Lead successfully designated.');
+        this.spinner.hide();
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
+        this.spinner.hide();
       });
   }
 
   private getCandidates() {
-    console.log('getting all candidates')
     this.userService.getCandidates()
       .subscribe(candidates => {
         this.candidates = [];
@@ -76,6 +75,7 @@ export class UserComponent implements OnInit {
   }
 
   private createUser(user: User) {
+    this.spinner.show();
     this.userService.create(user)
       .subscribe(u => {
         this.candidates.push(u);
@@ -83,23 +83,27 @@ export class UserComponent implements OnInit {
         $('#newUserModal').modal('hide');
         this.userService.emitUserAddtionEvent(user);
         this.msg.emitSuccessEvent('User successfully created.');
+        this.spinner.hide();
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
         $('#newUserModal').modal('hide');
+        this.spinner.hide();
       });
   }
 
   private updateUser(user: User) {
-    this.userService.update(user)
-      .subscribe(u => {
+    this.spinner.show();
+    this.userService.update(user).subscribe(u => {
         this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
         this.candidates.push(u);
         this.candidates = this.candidates.slice();
         $('#newUserModal').modal('hide');
         this.msg.emitSuccessEvent('User successfully updated.');
+        this.spinner.hide();
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
         $('#newUserModal').modal('hide');
+        this.spinner.hide();
       });
   }
 

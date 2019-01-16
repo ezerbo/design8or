@@ -5,6 +5,8 @@ import { ParameterService } from '../services/parameter.service';
 import { Parameter } from '../app.model';
 import { MessageService } from '../services/message.service';
 import { RotationService } from '../services/rotation.service';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { HttpErrorResponse } from '../../../node_modules/@angular/common/http';
 
 @Component({
   selector: 'app-rotation',
@@ -21,6 +23,7 @@ export class RotationComponent implements OnInit {
 
   constructor(
     private msg: MessageService,
+    private spinner: NgxSpinnerService,
     private atp: AmazingTimePickerService,
     private rotationService: RotationService,
     private parameterService: ParameterService
@@ -34,12 +37,17 @@ export class RotationComponent implements OnInit {
   }
 
   saveRotationTime() {
+    this.spinner.show();
     this.parameter.rotationTime = this.selectedTime;
     this.parameterService.update(this.parameter)
       .subscribe(() => {
         this.showRotationSaveBtn = false;
         this.msg.emitSuccessEvent('Rotation time successfully updated.');
         this.rotationService.emitRotationTimeUpdateEvent(this.selectedTime);
+        this.spinner.hide();
+      }, (err: HttpErrorResponse) => {
+        this.spinner.hide();
+        console.error(`${JSON.stringify(err)}`);
       });
   }
 

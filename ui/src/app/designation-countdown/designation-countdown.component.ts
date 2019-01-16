@@ -28,9 +28,8 @@ export class DesignationCountdownComponent implements OnInit {
         setInterval(() => { this.calculateTimeToDesignation() }, 1000);
       });
     //TODO Go over reactive programming
-    this.rotationService.rotationTimeEventBus$.subscribe(rotationTime => {
-      this.parameter.rotationTime = rotationTime;
-    });
+    this.rotationService.rotationTimeEventBus$.subscribe(rotationTime => this.parameter.rotationTime = rotationTime);
+    this.parameterService.parametersUpdateEventBus$.subscribe(parameter => this.parameter = parameter);
   }
 
   private rotationTime() {

@@ -3,6 +3,7 @@ package com.ss.design8or.model;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +18,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,23 +59,45 @@ public class Designation {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@Column(name = "is_current", nullable = false)
-	private boolean current;
+	@Column(name = "token", unique = false)
+	private String token;
 	
 	public Designation status(DesignationStatus status) {
 		setStatus(status);
 		return this;
 	}
 	
-	public Designation current(boolean current) {
-		setCurrent(current);
+	public Designation accept() {
+		setStatus(DesignationStatus.ACCEPTED);
 		return this;
 	}
+	
+	public Designation decline() {
+		setStatus(DesignationStatus.DECLINED);
+		return this;
+	}
+	
+	public boolean isPending() {
+		return Objects.equals(status, DesignationStatus.PENDING);
+	}
+	
+	public Designation token(String token) {
+		setToken(token);
+		return this;
+	}
+	
+	public Designation reassign() {
+		setStatus(DesignationStatus.REASSIGNED);
+		setToken(null);
+		return this;
+	}
+	
+	
 	
 	@PrePersist
 	public void onSave() {
 		setDesignationDate(new Date());
 		setStatus(DesignationStatus.PENDING);
-		setCurrent(true);
+		setToken(RandomStringUtils.randomAlphanumeric(30));
 	}
 }
