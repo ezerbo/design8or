@@ -8,20 +8,30 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
 
   today = new Date();
-
   showParametersPanel = false;
+  showCandidatesPanel = true;
+  showUsersPanel = false;
 
   constructor() { }
 
   ngOnInit() { }
 
-  onShowParameters() {
-    this.showParametersPanel = true;
-  }
-
-  onHideParameters() {
+  showCandidates() {
+    this.showCandidatesPanel = true;
     this.showParametersPanel = false;
+    this.showUsersPanel = false;
   }
 
+  showParameters() {
+    this.showCandidatesPanel = false;
+    this.showParametersPanel = true;
+    this.showUsersPanel = false;
+  }
+
+  showUsers() {
+    this.showCandidatesPanel = false;
+    this.showParametersPanel = false;
+    this.showUsersPanel = true;
+  }
 
 }

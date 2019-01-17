@@ -13,45 +13,38 @@ import { AssignmentService } from '../services/assignment.service';
 export class PoolComponent implements OnInit {
 
   pools: Pools
-
-  users: User[] = [];
+  usersCount: number;
 
   constructor(
     private userService: UserService,
     private poolService: PoolService,
-    private assignmentService: AssignmentService,
-  ) { $('#poolProgress').progress(); }
+    private assignmentService: AssignmentService) {}
 
   ngOnInit() {
-    this.poolService.getAll()
-      .subscribe(pools => { this.pools = pools });
-
+    $('#poolProgress').progress();
+    this.poolService.getAll().subscribe(pools => { this.pools = pools });
     this.assignmentService.assignmentEventBus$.subscribe(() => {
       this.pools.currentPoolParticipantsCount += 1;
       this.calculateProgress();
     });
-
-    this.userService.userAdditionEventBus$.subscribe(user => { this.onUserAddition(user) });
-
-    this.userService.userDeletionEventBus$.subscribe(user => { this.onUserDeletion(user) });
-
-    this.poolService.poolStartEventBus$.subscribe((pool) => { this.onPoolStart(pool) })
-
-    //TODO add user count to pools object
-    this.userService.getAll().subscribe(users => { this.users = users });
+    this.userService.userAdditionEventBus$.subscribe(() => this.onUserAddition());
+    this.userService.userDeletionEventBus$.subscribe(() => this.onUserDeletion());
+    this.poolService.poolStartEventBus$.subscribe((pool) => this.onPoolStart(pool))
+    this.userService.getAll().subscribe(users => { this.usersCount = users.length });//TODO add user count to pools object
   }
 
   calculateProgress() {
-    this.pools.currentPoolProgress = Math.floor((100 * this.pools.currentPoolParticipantsCount) / this.users.length);
+    let progress = (100 * this.pools.currentPoolParticipantsCount) / this.usersCount;
+    this.pools.currentPoolProgress = Math.floor(progress);
   }
 
-  onUserAddition(user: User) {
-    this.users.push(user);
+  onUserAddition() {
+    this.usersCount ++;
     this.calculateProgress();
   }
 
-  onUserDeletion(user: User) {
-    this.users = this.users.filter((u) => u.id != user.id);
+  onUserDeletion() {
+    this.usersCount --;
     this.calculateProgress();
   }
 

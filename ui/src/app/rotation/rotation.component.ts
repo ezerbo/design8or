@@ -6,7 +6,7 @@ import { Parameter } from '../app.model';
 import { MessageService } from '../services/message.service';
 import { RotationService } from '../services/rotation.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { HttpErrorResponse } from '../../../node_modules/@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-rotation',

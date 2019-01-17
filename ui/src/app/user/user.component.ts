@@ -3,10 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { User } from '../app.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { DesignationService } from '../services/designation.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { MessageService, processErrorResponse } from '../services/message.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { MessageService, processErrorResponse } from '../services/message.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-user',
@@ -15,13 +14,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class UserComponent implements OnInit {
 
-  designatedUser: User;
-  currentCandidate: User;
-  candidates: User[] = [];
-
-  userSelectionForm = new FormGroup({
-    userId: new FormControl('', [Validators.required])
-  });
+  user: User;
+  users: User[] = [];
 
   userForm = new FormGroup({
     id: new FormControl(''),
@@ -34,35 +28,15 @@ export class UserComponent implements OnInit {
   constructor(
     private msg: MessageService,
     private userService: UserService,
-    private spinner: NgxSpinnerService,
-    private designationService: DesignationService) {
-    $(() => { $('[data-toggle="tooltip"]').tooltip(); });
-  }
+    private spinner: NgxSpinnerService
+  ) { }
 
   ngOnInit() {
-    this.getCandidates();
-    this.designationService.designationEventBus$.subscribe(() => { this.getCandidates() });
-  }
-
-  designate() {
-    this.spinner.show();
-    this.designationService.designate(this.designatedUser)
-      .subscribe(() => {
-        $('#manualDesignationModal').modal('hide');
-        this.msg.emitSuccessEvent('Lead successfully designated.');
-        this.spinner.hide();
-      }, (errorResponse: HttpErrorResponse) => {
-        this.msg.emitErrorEvent(processErrorResponse(errorResponse));
-        this.spinner.hide();
-      });
-  }
-
-  private getCandidates() {
-    this.userService.getCandidates()
-      .subscribe(candidates => {
-        this.candidates = [];
-        this.candidates = candidates;
-      });
+    $(() => {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+    this.userService.getAll()
+      .subscribe(users => this.users = users);
   }
 
   saveUser() {
@@ -78,8 +52,8 @@ export class UserComponent implements OnInit {
     this.spinner.show();
     this.userService.create(user)
       .subscribe(u => {
-        this.candidates.push(u);
-        this.candidates = this.candidates.slice();
+        this.users.push(u);
+        this.users = this.users.slice();
         $('#newUserModal').modal('hide');
         this.userService.emitUserAddtionEvent(user);
         this.msg.emitSuccessEvent('User successfully created.');
@@ -94,9 +68,9 @@ export class UserComponent implements OnInit {
   private updateUser(user: User) {
     this.spinner.show();
     this.userService.update(user).subscribe(u => {
-        this.candidates = this.candidates.filter((c) => { return c.id != user.id; });
-        this.candidates.push(u);
-        this.candidates = this.candidates.slice();
+        this.users = this.users.filter((c) => { return c.id != user.id; });
+        this.users.push(u);
+        this.users = this.users.slice();
         $('#newUserModal').modal('hide');
         this.msg.emitSuccessEvent('User successfully updated.');
         this.spinner.hide();
@@ -107,17 +81,17 @@ export class UserComponent implements OnInit {
       });
   }
 
-  onDeleteUser(candidate: User) {
+  onDeleteUser(user: User) {
     $('#confirmationModal').modal('show');
-    this.currentCandidate = candidate;
+    this.user = user;
   }
 
   deleteUser() {
-    this.userService.delete(this.currentCandidate.id)
+    this.userService.delete(this.user.id)
       .subscribe(() => {
-        this.candidates = this.candidates.filter((c) => { return c.id != this.currentCandidate.id; });
+        this.users = this.users.filter((c) => { return c.id != this.user.id; });
         $('#confirmationModal').modal('hide');
-        this.userService.emitUserDeletiontionEvent(this.currentCandidate);
+        this.userService.emitUserDeletiontionEvent(this.user);
         this.msg.emitSuccessEvent('User successfully deleted.');
       }, (errorResponse: HttpErrorResponse) => {
         this.msg.emitErrorEvent(processErrorResponse(errorResponse));
@@ -125,26 +99,14 @@ export class UserComponent implements OnInit {
       });
   }
 
-  onEditUser(candidate: User) {
-    this.currentCandidate = candidate;
-    this.userForm.setValue(Object.assign({}, candidate));
+  onEditUser(user: User) {
+    this.user = user;
+    this.userForm.setValue(Object.assign({}, user));
     $('#newUserModal').modal('show');
   }
 
   onAddUser() {
     this.userForm.reset();
-  }
-
-  onDesignate() {
-    this.userSelectionForm.reset();
-  }
-
-  onUserSelectionChange(userId: number) {
-    this.designatedUser = this.candidates.find((user) => { return user.id == userId });
-  }
-
-  onUserSelectionCanceled() {
-    this.userSelectionForm.reset();
   }
 
   get firstName() { return this.userForm.get('firstName'); }

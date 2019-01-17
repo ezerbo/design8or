@@ -14,13 +14,14 @@ import { LeadUserComponent } from './lead-user/lead-user.component';
 import { PoolComponent } from './pool/pool.component';
 import { RotationComponent } from './rotation/rotation.component';
 import { MessageComponent } from './message/message.component';
-import { UserComponent } from './user/user.component';
+import { CandidateComponent } from './candidate/candidate.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { ParameterComponent } from './parameter/parameter.component';
 import { DesignationCountdownComponent } from './designation-countdown/designation-countdown.component';
 import { DesignatedUserComponent } from './designated-user/designated-user.component';
 import { DesignationResponseComponent } from './designation-response/designation-response.component';
+import { UserComponent } from './user/user.component';
 
 @NgModule({
    declarations: [
@@ -31,11 +32,12 @@ import { DesignationResponseComponent } from './designation-response/designation
       PoolComponent,
       RotationComponent,
       MessageComponent,
-      UserComponent,
+      CandidateComponent,
       ParameterComponent,
       DesignationCountdownComponent,
       DesignatedUserComponent,
-      DesignationResponseComponent
+      DesignationResponseComponent,
+      UserComponent
    ],
    imports: [
       FormsModule,

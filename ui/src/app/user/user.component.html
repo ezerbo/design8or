@@ -1,11 +1,10 @@
 <div class="card">
-  <div class="card-header">Next Candidates</div>
+  <div class="card-header">Users in the system</div>
   <div class="card-body">
     <div class="text-center">
       <h5 class="ui icon header">
-        
         <i class="users icon"></i>
-        Candidates
+        Users
       </h5>
     </div>
     <div class="ui divider"></div>
@@ -19,38 +18,36 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let candidate of candidates">
+        <tr *ngFor="let user of users">
           <td data-label="FirstName">
             <i class="user icon"></i>
-            {{candidate.firstName}}
+            {{user.firstName}}
           </td>
-          <td data-label="LastName">{{candidate.lastName}}</td>
-          <td data-label="EmailAddress">{{candidate.emailAddress}}</td>
+          <td data-label="LastName">{{user.lastName}}</td>
+          <td data-label="EmailAddress">{{user.emailAddress}}</td>
           <td data-label="Actions">
-            <i class="times circle icon hand-cursor mr-3" (click)="onDeleteUser(candidate)" data-toggle="tooltip"
-              data-placement="bottom" title="Delete user"></i>
-            <i class="edit circle icon hand-cursor" (click)="onEditUser(candidate)" data-toggle="tooltip"
-              data-placement="bottom" title="Edit user"></i>
+            <i class="times circle icon hand-cursor mr-3" (click)="onDeleteUser(user)" data-toggle="tooltip" data-placement="bottom"
+              title="Delete user" *ngIf="!user.lead"></i>
+            <i class="edit circle icon hand-cursor" (click)="onEditUser(user)" data-toggle="tooltip" data-placement="bottom" title="Edit user"
+              *ngIf="!user.lead"></i>
+            <a class="ui label" *ngIf="user.lead">
+              (Lead)
+            </a>
           </td>
         </tr>
       </tbody>
       <tfoot class="full-width">
         <tr>
           <th colspan="4">
-            <div class="ui right floated small primary labeled icon button" [ngClass]="{'disabled': candidates.length == 0}"
-              data-toggle="modal" data-target="#manualDesignationModal" (click)="onDesignate()">
-              <i class="hand point right icon"></i> Designate Manually
-            </div>
-            <div class="ui right floated small primary labeled icon button" data-toggle="modal" data-target="#newUserModal"
-              (click)="onAddUser()">
+            <div class="ui right floated small primary labeled icon button" data-toggle="modal" data-target="#newUserModal" (click)="onAddUser()">
               <i class="user plus icon"></i> Add User
             </div>
             <div class="ui labeled button" tabindex="0">
               <div class="ui basic blue button">
-                <i class="users icon"></i> Candidates
+                <i class="users icon"></i> Users
               </div>
               <a class="ui basic left pointing blue label">
-                {{candidates.length}}
+                {{users.length}}
               </a>
             </div>
           </th>
@@ -60,38 +57,8 @@
   </div>
 </div>
 
-<!-- Manual Designation Modal -->
-<div class="modal fade" id="manualDesignationModal" tabindex="-1" role="dialog" aria-labelledby="manualDesignationModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="manualDesignationModalLabel">Designate User</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form [formGroup]="userSelectionForm" (ngSubmit)="designate()">
-        <div class="modal-body">
-          <label>Select User</label>
-          <select name="user" formControlName="userId" class="custom-select" (change)="onUserSelectionChange($event.target.value)">
-            <option *ngFor="let user of candidates" value="{{user.id}}">{{user.firstName}} {{user.lastName}}</option>
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="onUserSelectionCanceled()">Cancel</button>
-          <button class="ui primary labeled icon button" [disabled]="!userSelectionForm.valid">
-            <i class="hand point right icon"></i>Designate
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 <!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
-  aria-hidden="true">
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -129,24 +96,22 @@
             <input formControlName="id" type="hidden" id="id">
             <div class="form-group col-md-6">
               <label for="firstNameInput">First Name</label>
-              <input formControlName="firstName" class="form-control" id="firstNameInput" placeholder="First Name"
-                required>
+              <input formControlName="firstName" class="form-control" id="firstNameInput" placeholder="First Name" required>
               <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)">
                 <label *ngIf="userForm.controls['firstName'].errors.required" class="text-danger">First Name is required</label>
               </div>
             </div>
             <div class="form-group col-md-6">
               <label for="lastNameInput">Last Name</label>
-              <input formControlName="lastName" class="form-control" id="lastNameInput" placeholder="Last Name"
-                required>
+              <input formControlName="lastName" class="form-control" id="lastNameInput" placeholder="Last Name" required>
               <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)">
                 <label *ngIf="userForm.controls['lastName'].errors.required" class="text-danger">Last Name is required</label>
               </div>
             </div>
             <div class="form-group mb-2 col-md-12">
               <label for="lastNameInput">Email Address</label>
-              <input formControlName="emailAddress" type="email" class="form-control" id="emailAddressInput"
-                placeholder="Email Address" required>
+              <input formControlName="emailAddress" type="email" class="form-control" id="emailAddressInput" placeholder="Email Address"
+                required>
               <div *ngIf="emailAddress.invalid && (emailAddress.dirty || emailAddress.touched)">
                 <label *ngIf="userForm.controls['emailAddress'].errors.required" class="text-danger">Email address is required</label>
                 <label *ngIf="userForm.controls['emailAddress'].errors.email" class="text-danger">Invalid email address</label>

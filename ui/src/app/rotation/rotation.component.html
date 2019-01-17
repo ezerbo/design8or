@@ -1,16 +1,20 @@
 <div *ngIf="parameter" class="mb-2" style="margin: auto; width: 100%">
   <div class="row">
     <div class="col-lg-4">
-      <div class="ui right labeled button" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="Change rotation time"
-        (click)="selectDesignationTime()">
-        <div class="ui icon button primary">
-          <i class="clock icon"></i>
-        </div>
-        <label class="ui basic label hand-cursor">Rotation: Everyday at {{rotationTime() | date: 'shortTime'}}</label>
+      <div class="ui compact menu">
+        <a class="item">
+          <i class="icon sync alternate"></i> Rotates everyday at {{rotationTime() | date: 'shortTime'}}
+        </a>
+      </div>
+    </div>
+    <div class="col-lg-4" *ngIf="!showRotationSaveBtn">
+      <div class="ui icon large labeled button primary" (click)="selectDesignationTime()" tabindex="0" data-toggle="tooltip" data-placement="bottom"
+        title="Change rotation time">
+        <i class="clock icon"></i> Change
       </div>
     </div>
     <div class="col-lg-4">
-      <div class="ui buttons" *ngIf="showRotationSaveBtn">
+      <div class="ui buttons large" *ngIf="showRotationSaveBtn">
         <button class="ui button" (click)="cancelRotationTimeUpdate()">Cancel</button>
         <div class="or"></div>
         <button class="ui primary button active" (click)="saveRotationTime()">Save</button>
