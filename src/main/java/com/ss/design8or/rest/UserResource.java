@@ -2,7 +2,6 @@ package com.ss.design8or.rest;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.DesignationRepository;
-import com.ss.design8or.repository.UserRepository;
+import com.ss.design8or.service.UserService;
 
 /**
  * @author ezerbo
@@ -27,29 +26,28 @@ import com.ss.design8or.repository.UserRepository;
 @RequestMapping("/users")
 public class UserResource {
 
-	private UserRepository repository;
-	
+	private UserService service;
 	private DesignationRepository designationRepository;
 	
-	public UserResource(UserRepository repository,
+	public UserResource(UserService service,
 			DesignationRepository designationRepository) {
-		this.repository = repository;
+		this.service = service;
 		this.designationRepository = designationRepository;
 	}
 	
 	@GetMapping
 	public ResponseEntity<List<User>> getAll() {
-		return ResponseEntity.ok(repository.findAll());
+		return ResponseEntity.ok(service.getAll());
 	}
 	
 	@GetMapping("/candidates")
 	public ResponseEntity<List<User>> getNextCandidates() {
-		return ResponseEntity.ok(repository.getAssignmentCandidates());
+		return ResponseEntity.ok(service.getCurrentPoolCandidates());
 	}
 	
 	@GetMapping("/lead")
 	public ResponseEntity<User> getLeadUser() {
-		return repository.findByLeadTrue()
+		return service.getCurrentLead()
 				.map(lead -> ResponseEntity.ok(lead))
 				.orElse(ResponseEntity.notFound().build());
 	}
@@ -66,33 +64,23 @@ public class UserResource {
 		if(Objects.nonNull(user.getId())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		repository.findByEmailAddress(user.getEmailAddress())
-			.ifPresent(e -> {
-				throw new RuntimeException(String.format("Email address '%s' is already in use", e.getEmailAddress()));
-			});
-		user = repository.save(user);
+		user =	service.create(user);
 		return ResponseEntity.ok(user);
 	}
 	
 	@PutMapping
 	public ResponseEntity<?> update(@RequestBody User user) {
-		if(Objects.isNull(user.getId())) {
+		final long userId = user.getId();
+		if(Objects.isNull(userId)) {
 			return create(user);
 		}
-		Optional<User> existingUser = repository.findByEmailAddress(user.getEmailAddress());
-		if(existingUser.isPresent() && (user.getId() != existingUser.get().getId())) {
-			throw new RuntimeException(String.format("Email address '%s' is already in use", user.getEmailAddress()));
-		}
-		user.setAssignments(existingUser.get().getAssignments()); // <--- done so that 'user' is not considered detached
-		user = repository.save(user);
+		user = service.update(user);
 		return ResponseEntity.ok(user);
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		User user = repository.findById(id)
-		.orElseThrow(() -> new RuntimeException(""));
-		repository.delete(user);
+		service.delete(id);
 		return ResponseEntity.ok(null);
 	}
 	

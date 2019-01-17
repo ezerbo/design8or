@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			+ " u.id not in (select a.id.userId from Assignment a inner join Pool p on a.id.poolId = p.id where p.endDate is null)"
 			+ " and u.id not in (select d.user.id from Designation d where lower(d.status)='pending')"
 			+ " order by u.lastName asc")
-	List<User> getAssignmentCandidates();
+	List<User> getCurrentPoolCandidates();
 	
 	Optional<User> findByLeadTrue();
 	

@@ -103,7 +103,7 @@ public class DesignationService {
 	 */
 	public User designate() {
 		log.info("Designating next lead...");
-		List<User> candidates = userRepository.getAssignmentCandidates();
+		List<User> candidates = userRepository.getCurrentPoolCandidates();
 		if(candidates.isEmpty()) {
 			log.info("Current pool ended, starting a new one");
 			poolRepository.findCurrent().map(pool -> poolRepository.save(pool.end()));//complete current pool

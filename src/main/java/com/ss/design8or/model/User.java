@@ -69,6 +69,21 @@ public class User implements Serializable {
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Designation> designations;
 	
+	public User emailAddress(String emailAddress) {
+		setEmailAddress(emailAddress);
+		return this;
+	}
+	
+	public User firstName(String firstName) {
+		setFirstName(firstName);
+		return this;
+	}
+	
+	public User lastName(String lastName) {
+		setLastName(lastName);
+		return this;
+	}
+	
 	public User elect() {
 		setLead(true);
 		return this;
