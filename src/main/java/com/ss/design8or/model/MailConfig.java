@@ -20,7 +20,4 @@ public class MailConfig {
 	private String designationEmailSubject;
 	
 	private String designationResponseBaseUrl;
-	
-	private String emailEncryptionKey;
-	
 }

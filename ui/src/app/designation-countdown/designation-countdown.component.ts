@@ -21,15 +21,17 @@ export class DesignationCountdownComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.parameterService.get()
-      .subscribe(parameter => {
+    this.parameterService.get().subscribe(parameter => {
         this.parameter = parameter;
         this.calculateTimeToDesignation();
-        setInterval(() => { this.calculateTimeToDesignation() }, 1000);
-      });
+        setInterval(() => this.calculateTimeToDesignation(), 1000)});
+
     //TODO Go over reactive programming
-    this.rotationService.rotationTimeEventBus$.subscribe(rotationTime => this.parameter.rotationTime = rotationTime);
-    this.parameterService.parametersUpdateEventBus$.subscribe(parameter => this.parameter = parameter);
+    this.rotationService.rotationTimeEventBus$.subscribe(
+      rotationTime => this.parameter.rotationTime = rotationTime);
+
+    this.parameterService.parametersUpdateEventBus$.subscribe(
+      parameter => this.parameter = parameter);
   }
 
   private rotationTime() {

@@ -14,6 +14,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import com.ss.design8or.config.ServiceProperties;
 import com.ss.design8or.model.Designation;
 import com.ss.design8or.model.MailConfig;
+import com.ss.design8or.model.User;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 class EmailNotificationService {
 
     private static final String USER = "user";
+    private static final String DECLINED_DESIGNATION_USER = "declinedDesignationUser";
     private static final String DESIGNATION_RESPONSE_URL = "reponseUrl";
     private static final String YEAR = "year";
     
@@ -64,20 +66,31 @@ class EmailNotificationService {
     
     @Async
     public void sendDesignationEvent(Designation designation) {
-        Context context = new Context();
-        context.setVariable(USER, designation.getUser());
-        context.setVariable(DESIGNATION_RESPONSE_URL, computeDesignationResponseUrl(designation));
-        context.setVariable(YEAR, LocalDate.now().getYear());
-        String content = templateEngine.process("designation-email", context);
-        String subject = properties.getMail().getDesignationEmailSubject();
-        sendEmail(designation.getUser().getEmailAddress(), subject, content, false, true);
+       sendDesignationEvent(designation, designation.getUser());
     }
     
-    private String computeDesignationResponseUrl(Designation designation) {
+    @Async
+    public void sendDesignationEvent(Designation designation, User candidate) {
+        Context context = new Context();
+        context.setVariable(USER, candidate);
+        String responseUrl = computeDesignationResponseUrl(designation.getToken(), candidate.getEmailAddress());
+		context.setVariable(DESIGNATION_RESPONSE_URL, responseUrl);
+        context.setVariable(YEAR, LocalDate.now().getYear());
+        String content = null;
+        if(designation.isDeclined()) {
+        	context.setVariable(DECLINED_DESIGNATION_USER, designation.getUser());
+        	content = templateEngine.process("designation-broadcast", context);
+        } else {
+        	content = templateEngine.process("designation", context);
+        }
+        String subject = properties.getMail().getDesignationEmailSubject();
+        sendEmail(candidate.getEmailAddress(), subject, content, false, true);
+    }
+    
+    private String computeDesignationResponseUrl(String token, String emailAddress) {
     	MailConfig mailConfig = properties.getMail();
     	String responseBaseUrl = mailConfig.getDesignationResponseBaseUrl();
-    	return String.format("%s/designation-response?token=%s&email=%s", responseBaseUrl,
-    			designation.getToken(), designation.getUser().getEmailAddress());
+    	return String.format("%s/designation-response?token=%s&email=%s", responseBaseUrl, token, emailAddress);
     }
     
 }

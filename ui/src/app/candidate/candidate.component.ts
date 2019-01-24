@@ -7,6 +7,7 @@ import { DesignationService } from '../services/designation.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService, processErrorResponse } from '../services/message.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { AssignmentService } from '../services/assignment.service';
 
 @Component({
   selector: 'app-candidate',
@@ -27,11 +28,15 @@ export class CandidateComponent implements OnInit {
     private msg: MessageService,
     private userService: UserService,
     private spinner: NgxSpinnerService,
+    private assignmentService: AssignmentService,
     private designationService: DesignationService) {}
 
   ngOnInit() {
     this.getCandidates();
-    this.designationService.designationEventBus$.subscribe(() => { this.getCandidates() });
+    this.designationService.designationEventBus$.subscribe(() => this.getCandidates());
+    this.assignmentService.assignmentEventBus$.subscribe(() => {
+      setTimeout(() => { this.getCandidates() }, 3000);
+    });
   }
 
   designate() {
@@ -49,10 +54,7 @@ export class CandidateComponent implements OnInit {
 
   private getCandidates() {
     this.userService.getCandidates()
-      .subscribe(candidates => {
-        this.candidates = [];
-        this.candidates = candidates;
-      });
+      .subscribe(candidates => this.candidates = candidates );
   }
 
   onDesignate() {
@@ -66,6 +68,5 @@ export class CandidateComponent implements OnInit {
   onUserSelectionCanceled() {
     this.userSelectionForm.reset();
   }
-
 
 }

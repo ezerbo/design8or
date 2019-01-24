@@ -1,5 +1,7 @@
 package com.ss.design8or.service.notification;
 
+import java.util.List;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +9,7 @@ import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.Designation;
 import com.ss.design8or.model.Parameter;
 import com.ss.design8or.model.Pool;
+import com.ss.design8or.model.User;
 
 /**
  * @author ezerbo
@@ -38,9 +41,12 @@ public class NotificationService {
 	}
 	
 	@Async
-	public void emitDesignationDeclinationEvent(Designation designation) {
-		//sendAssignmentEventAsWebSocketMessage(assignment);
-		//TODO broadcast to all user but the one who declined
+	public void emitDesignationDeclinationEvent(Designation designation, List<User> candidates) {
+		candidates.stream()
+		.forEach(candidate -> {
+			mailService.sendDesignationEvent(designation, candidate); //Broadcast to all users but the one who declined
+		});
+		webSocketNotificationService.sendDesignationEvent(designation);
 	}
 	
 	@Async

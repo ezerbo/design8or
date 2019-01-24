@@ -13,7 +13,7 @@ import com.ss.design8or.model.Designation;
  */
 public interface DesignationRepository extends JpaRepository<Designation, Long> {
 
-	@Query("from Designation d where d.token is not null and d.status='PENDING'")
+	@Query("from Designation d where d.token is not null")
 	Optional<Designation> findCurrent();
 	
 	@Query("from Designation d where d.token is not null and d.status='DECLINED'")

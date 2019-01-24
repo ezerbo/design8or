@@ -10,28 +10,22 @@ import { MessageService } from '../services/message.service';
 export class MessageComponent implements OnInit {
 
   error: Error;
-
   success: string;
 
   constructor(private msg: MessageService) { }
 
   ngOnInit() {
-    this.msg.successMessageEventBus$.subscribe(success => {
-      this.onSuccess(success);
-    });
-
-    this.msg.errorMessageEventBus$.subscribe(error => {
-      this.onError(error);
-    });
+    this.msg.successMessageEventBus$.subscribe(success => this.onSuccess(success));
+    this.msg.errorMessageEventBus$.subscribe(error => this.onError(error));
   }
 
   private onSuccess(success: string) {
-    setTimeout(() => { this.success = null }, 3000);
+    setTimeout(() => this.success = null, 3000);
     this.success = success;
   }
 
   private onError(error: Error) {
-    setTimeout(() => { this.error = null }, 3000);
+    setTimeout(() => this.error = null, 3000);
     this.error = error;
   }
 

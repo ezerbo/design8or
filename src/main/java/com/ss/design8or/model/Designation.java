@@ -81,6 +81,14 @@ public class Designation {
 		return Objects.equals(status, DesignationStatus.PENDING);
 	}
 	
+	public boolean isDeclined() {
+		return Objects.equals(status, DesignationStatus.DECLINED);
+	}
+	
+	public boolean isAccepted() {
+		return Objects.equals(status, DesignationStatus.ACCEPTED);
+	}
+	
 	public Designation token(String token) {
 		setToken(token);
 		return this;

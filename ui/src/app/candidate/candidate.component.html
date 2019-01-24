@@ -8,6 +8,7 @@
       </h5>
     </div>
     <div class="ui divider"></div>
+    <!-- Candidates Table -->
     <table class="ui striped table">
       <thead>
         <tr>
@@ -29,8 +30,8 @@
       <tfoot class="full-width">
         <tr>
           <th colspan="4">
-            <div class="ui right floated small primary labeled icon button" [ngClass]="{'disabled': candidates.length == 0}"
-              data-toggle="modal" data-target="#manualDesignationModal" (click)="onDesignate()">
+            <div class="ui right floated small primary labeled icon button" [ngClass]="{'disabled': candidates.length == 0}" data-toggle="modal"
+              data-target="#manualDesignationModal" (click)="onDesignate()">
               <i class="hand point right icon"></i> Designate Manually
             </div>
             <div class="ui labeled button" tabindex="0">
@@ -76,4 +77,3 @@
     </div>
   </div>
 </div>
-

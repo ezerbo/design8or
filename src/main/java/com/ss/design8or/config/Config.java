@@ -2,7 +2,6 @@ package com.ss.design8or.config;
 
 import java.util.concurrent.Executor;
 
-import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -12,8 +11,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.ss.design8or.model.MailConfig;
-
 /**
  * @author ezerbo
  *
@@ -21,13 +18,10 @@ import com.ss.design8or.model.MailConfig;
 @Configuration
 public class Config extends WebSecurityConfigurerAdapter {
 	
-	private MailConfig mailConfig;
-
 	private CorsConfiguration config;
 
 	public Config(ServiceProperties properties) {
 		this.config = properties.getCors();
-		this.mailConfig = properties.getMail();
 	}
 	
 	@Override
@@ -56,13 +50,6 @@ public class Config extends WebSecurityConfigurerAdapter {
 		config.addExposedHeader("X-Total-Count");
 		source.registerCorsConfiguration("/**", config);
 		return source;
-	}
-	
-	@Bean
-	public BasicTextEncryptor basicTextEncryptor() {
-		BasicTextEncryptor basicTextEncryptor = new BasicTextEncryptor();
-		basicTextEncryptor.setPasswordCharArray(mailConfig.getEmailEncryptionKey().toCharArray());
-    	return basicTextEncryptor;
 	}
 	
 	@Bean

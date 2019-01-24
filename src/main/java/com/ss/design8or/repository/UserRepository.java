@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	@Query("from User u where"
 			+ " u.id not in (select a.id.userId from Assignment a inner join Pool p on a.id.poolId = p.id where p.endDate is null)"
-			+ " and u.id not in (select d.user.id from Designation d where lower(d.status)='pending')"
+			+ " and u.id not in (select d.user.id from Designation d where d.token is not null)"
 			+ " order by u.lastName asc")
 	List<User> getCurrentPoolCandidates();
 	

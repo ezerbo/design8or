@@ -14,18 +14,17 @@ export class DesignatedUserComponent implements OnInit {
 
   constructor(
     private assignmentService: AssignmentService,
-    private designationService: DesignationService
-  ) {}
+    private designationService: DesignationService) {}
 
   ngOnInit() {
     this.designationService.getCurrent()
-      .subscribe(designation => { this.designation = designation });
+      .subscribe(designation => this.designation = designation);
 
     this.designationService.designationEventBus$
-      .subscribe(designation => { this.designation = designation; });
+      .subscribe(designation => this.designation = designation);
 
     this.assignmentService.assignmentEventBus$
-      .subscribe(() => { this.designation = null }); //Will hide designated user panel when a new lead is assigned
+      .subscribe(() => this.designation = null); //Will hide designated user panel when a new lead is assigned
   }
 
 }

@@ -67,17 +67,20 @@ public class DesignationService {
 	
 	public Designation processDesignationResponse(DesignationResponse designationResponse) {
 		log.info("Processing designation response {}", designationResponse);
-		Designation designation = getDesignationfromResponse(designationResponse);
+		Designation designation = getDesignationFromResponse(designationResponse);
 		if(ACCEPT_RESPONSE.equalsIgnoreCase(designationResponse.getResponse())) {
 			Assignment assignment = assignmentService.create(designation.accept().getUser(), getCurrentPool());
+			designation.token(null);
 			notificationService.emitAssignmentEvent(assignment);
-		} else {
-			notificationService.emitDesignationDeclinationEvent(designation.decline());//Broadcast to all users
+		} else if(!designation.isDeclined()) { // If designation has not already been declined
+			designation.decline();
+			List<User> candidates = userRepository.getCurrentPoolCandidates();
+			notificationService.emitDesignationDeclinationEvent(designation, candidates);//Broadcast to all users
 		}
-		return designationRepository.save(designation.token(null));
+		return designationRepository.save(designation);
 	}
 	
-	private Designation getDesignationfromResponse(DesignationResponse designationResponse) {
+	private Designation getDesignationFromResponse(DesignationResponse designationResponse) {
 		validateResponse(designationResponse.getResponse());
 		User user = userRepository.findByEmailAddress(designationResponse.getEmailAddress())
 				.orElseThrow(() -> new UserNotFoundException(designationResponse.getEmailAddress()));
@@ -85,8 +88,9 @@ public class DesignationService {
 				.filter(d -> d.isPending() && Objects.equals(d.getToken(), designationResponse.getToken())).findAny()
 				.orElse(designationRepository.findCurrentAndDeclined()); //If user has not been designated, find a designation that's current and has been declined
 		if(Objects.isNull(designation)) {
-			throw new DesignationNotFoundException(user.getEmailAddress());
+			throw new DesignationNotFoundException();
 		}
+		designation.setUser(user); //User whose email address is in the response.
 		return designation;
 	}
 	

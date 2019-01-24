@@ -17,11 +17,9 @@ export class LeadUserComponent implements OnInit {
     private assignmentService: AssignmentService) { }
 
   ngOnInit() {
-    this.userService.getLead()
-      .subscribe(lead => { this.lead = lead });
-    
-    this.assignmentService.assignmentEventBus$
-      .subscribe(assignment => { this.lead = assignment.user });
+    this.userService.getLead().subscribe(lead => this.lead = lead);
+    this.assignmentService.assignmentEventBus$.subscribe(
+      assignment => this.lead = assignment.user);
   }
 
 }
