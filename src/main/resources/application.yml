@@ -33,6 +33,7 @@ app:
     subject: zerboedouard@gmail.com
     public-key: BF_aZ-cmliVi5qbtxhGZrxxGZtEys0aLjZLhmtrboGtGiV__OxZa_emH2spKWNx8lZni_11a4oUJCfuEdT8x5rg
     private-key: PyHDwHGKXXt5Ge9phcghR0TMo53ABZCIn2PpjcbWiuQ
-  mail:     from: zerboedouard@gmail.com
+  mail: 
+    from: zerboedouard@gmail.com
     designation-email-subject: You have been selected to be the lead
     designation-response-base-url: http://localhost:4200
