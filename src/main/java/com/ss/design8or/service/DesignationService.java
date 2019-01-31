@@ -59,8 +59,11 @@ public class DesignationService {
 	public User designate(User user) {
 		final long userId = user.getId();
 		user = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(userId));
-		designationRepository.findCurrent().map(d -> designationRepository.save(d.reassign())); //<--- reassign() sets status to 'REASSINGED' and nullify token
-		Designation designation =  designationRepository.save(Designation.builder().user(user).build());
+		designationRepository.findCurrent().map(d -> d.reassign()).map(d -> designationRepository.save(d)); //<--- reassign() sets status to 'REASSINGED' and nullify token
+		Designation designation = Designation.builder()
+				.user(user)
+				.build();
+		designation =  designationRepository.save(designation);
 		notificationService.emitDesignationEvent(designation);
 		return user;
 	}
@@ -75,7 +78,7 @@ public class DesignationService {
 		} else if(!designation.isDeclined()) { // If designation has not already been declined
 			designation.decline();
 			List<User> candidates = userRepository.getCurrentPoolCandidates();
-			notificationService.emitDesignationDeclinationEvent(designation, candidates);//Broadcast to all users
+			notificationService.emitDesignationEvent(designation, candidates);//Broadcast to all users
 		}
 		return designationRepository.save(designation);
 	}

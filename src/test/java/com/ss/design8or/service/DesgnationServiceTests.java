@@ -123,7 +123,7 @@ public class DesgnationServiceTests {
 	@Test
 	public void processDesignationResponseThrowsDesignationNotFoundException() {
 		expectedException.expect(DesignationNotFoundException.class);
-		expectedException.expectMessage("No designation Found. I might have already been accepted.");
+		expectedException.expectMessage("No designation Found. It may have already been accepted.");
 		DesignationResponse response = DesignationResponse.builder()
 				.response("accept")
 				.emailAddress("sandji.vinsmoke@onpiece.com")
@@ -157,7 +157,7 @@ public class DesgnationServiceTests {
 				.token("Vqiy3c3Z4uGm7rk8SECupeNKoOHeZ7") //<----- chopper.tonytony@onepiece.com
 				.build();
 		Designation designation = service.processDesignationResponse(response);
-		verify(notificationService, times(1)).emitDesignationDeclinationEvent(any(Designation.class), any());
+		verify(notificationService, times(1)).emitDesignationEvent(any(Designation.class), any());
 		assertThat(designation.getStatus()).isEqualByComparingTo(DesignationStatus.DECLINED);
 	}
 	

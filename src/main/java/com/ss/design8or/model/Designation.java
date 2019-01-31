@@ -77,6 +77,11 @@ public class Designation {
 		return this;
 	}
 	
+	public Designation stale() {
+		setStatus(DesignationStatus.STALED);
+		return this;
+	}
+	
 	public boolean isPending() {
 		return Objects.equals(status, DesignationStatus.PENDING);
 	}
@@ -87,6 +92,10 @@ public class Designation {
 	
 	public boolean isAccepted() {
 		return Objects.equals(status, DesignationStatus.ACCEPTED);
+	}
+	
+	public boolean isStale() {
+		return Objects.equals(status, DesignationStatus.STALED);
 	}
 	
 	public Designation token(String token) {

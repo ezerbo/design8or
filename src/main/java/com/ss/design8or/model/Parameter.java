@@ -32,6 +32,9 @@ public class Parameter {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 	
-	@Column(name = "rotation_time")
+	@Column(name = "rotation_time", nullable = false)
 	private LocalTime rotationTime;
+	
+	@Column(name = "stale_request_countdown", nullable = false)
+	private Long staleRequestEventBroadcastCountdown;
 }

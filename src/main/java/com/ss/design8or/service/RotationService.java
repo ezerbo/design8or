@@ -14,6 +14,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.springframework.stereotype.Component;
 
+import com.ss.design8or.service.job.RotationJob;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**

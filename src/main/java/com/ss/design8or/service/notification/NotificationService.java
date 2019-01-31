@@ -41,12 +41,12 @@ public class NotificationService {
 	}
 	
 	@Async
-	public void emitDesignationDeclinationEvent(Designation designation, List<User> candidates) {
+	public void emitDesignationEvent(Designation designation, List<User> candidates) {
 		candidates.stream()
 		.forEach(candidate -> {
 			mailService.sendDesignationEvent(designation, candidate); //Broadcast to all users but the one who declined
 		});
-		webSocketNotificationService.sendDesignationEvent(designation);
+		webSocketNotificationService.sendDesignationEvent(designation); //Notify via web sockets that the current designation request has been declined
 	}
 	
 	@Async

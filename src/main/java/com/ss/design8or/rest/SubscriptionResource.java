@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.design8or.error.SubscriptionExistException;
 import com.ss.design8or.model.Subscription;
 import com.ss.design8or.model.SubscriptionDTO;
 import com.ss.design8or.repository.SubscriptionRepository;
@@ -34,6 +35,9 @@ public class SubscriptionResource {
 	@PostMapping
 	public ResponseEntity<Subscription> create(@RequestBody SubscriptionDTO subscriptionDTO) {
 		log.info("Subscribing : {}", subscriptionDTO);
+		repository.findByEndpointOrAuthOrP256dh(subscriptionDTO.getEndpoint(),
+				subscriptionDTO.getKeys().getAuth(), subscriptionDTO.getKeys().getP256dh())
+		.ifPresent(s -> { throw new SubscriptionExistException(); });
 		return ResponseEntity.ok(repository.save(subscriptionDTO.toSubscription()));
 	}
 	
