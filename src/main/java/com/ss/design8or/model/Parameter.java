@@ -35,6 +35,6 @@ public class Parameter {
 	@Column(name = "rotation_time", nullable = false)
 	private LocalTime rotationTime;
 	
-	@Column(name = "stale_request_countdown", nullable = false)
-	private Long staleRequestEventBroadcastCountdown;
+	@Column(name = "st_req_timer_delay", nullable = false)
+	private Long staleRequestTimeDelay;
 }

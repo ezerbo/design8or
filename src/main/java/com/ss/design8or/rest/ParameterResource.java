@@ -1,6 +1,5 @@
 package com.ss.design8or.rest;
 
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import org.quartz.SchedulerException;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.Parameter;
-import com.ss.design8or.repository.ParameterRepository;
+import com.ss.design8or.service.ParameterService;
 import com.ss.design8or.service.RotationService;
 import com.ss.design8or.service.notification.NotificationService;
 
@@ -24,26 +23,22 @@ import com.ss.design8or.service.notification.NotificationService;
 @RequestMapping("/parameters")
 public class ParameterResource {
 
-	private ParameterRepository repository;
+	private ParameterService service;
 	private RotationService rotationService;
 	private NotificationService notificationService;
 
-	public ParameterResource(ParameterRepository repository,
+	public ParameterResource(ParameterService service,
 			RotationService rotationService, NotificationService notificationService) {
-		this.repository = repository;
+		this.service = service;
 		this.rotationService = rotationService;
 		this.notificationService = notificationService;
 	}
 
 	@GetMapping
 	public ResponseEntity<?> get() {
-		Parameter parameter = null;
-		try {
-			parameter = repository.findAll().stream().findFirst().get();
-		} catch (NoSuchElementException e) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(parameter);
+		return service.getOptionalParamter()
+				.map(p -> ResponseEntity.ok(p))
+				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@PutMapping
@@ -51,7 +46,7 @@ public class ParameterResource {
 		if(Objects.isNull(parameter.getId())) {
 			throw new RuntimeException("No parameter identifier found");
 		}
-		parameter = repository.save(parameter);
+		parameter = service.save(parameter);
 		rotationService.rescheduleRotation(parameter.getRotationTime());
 		notificationService.emitParametersUpdateEvent(parameter);
 		return ResponseEntity.ok(parameter);

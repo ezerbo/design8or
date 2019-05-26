@@ -15,6 +15,10 @@ export class DesignationCountdownComponent implements OnInit {
 
   countdown: string;
 
+  secondsInADay = 86400;
+
+  secondsInAnHour = 3600;
+
   constructor(
     private rotationService: RotationService,
     private parameterService: ParameterService
@@ -22,9 +26,10 @@ export class DesignationCountdownComponent implements OnInit {
 
   ngOnInit() {
     this.parameterService.get().subscribe(parameter => {
-        this.parameter = parameter;
-        this.calculateTimeToDesignation();
-        setInterval(() => this.calculateTimeToDesignation(), 1000)});
+      this.parameter = parameter;
+      this.calculateTimeToDesignation();
+      setInterval(() => this.calculateTimeToDesignation(), 1000)
+    });
 
     //TODO Go over reactive programming
     this.rotationService.rotationTimeEventBus$.subscribe(
@@ -46,13 +51,12 @@ export class DesignationCountdownComponent implements OnInit {
     if (this.rotationTime().isAfter(now)) {
       secondsToDesignation = rotationTimeInSeconds - currentTimeInSeconds;
     } else {
-      secondsToDesignation = (86400 - currentTimeInSeconds) + rotationTimeInSeconds;
+      secondsToDesignation = (this.secondsInADay - currentTimeInSeconds) + rotationTimeInSeconds;
     }
-    let days = Math.floor(secondsToDesignation / 86400);
-    let hours = Math.floor((secondsToDesignation % 86400) / 3600);
-    let minutes = Math.floor((secondsToDesignation % 86400) % 3600 / 60);
-    let seconds = ((secondsToDesignation % 86400) % 3600) % 60;
-    this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    let hours = Math.floor((secondsToDesignation % this.secondsInADay) / this.secondsInAnHour);
+    let minutes = Math.floor((secondsToDesignation % this.secondsInADay) % this.secondsInAnHour / 60);
+    let seconds = ((secondsToDesignation % this.secondsInADay) % this.secondsInAnHour) % 60;
+    this.countdown = `${hours}h ${minutes}m ${seconds}s`;
   }
 
   toSeconds(time: moment.Moment) {

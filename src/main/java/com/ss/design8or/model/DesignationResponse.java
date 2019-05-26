@@ -17,7 +17,7 @@ public class DesignationResponse {
 	
 	private String token;
 	
-	private String response;
+	private String response; //accept or decline
 	
 	private String emailAddress;
 }

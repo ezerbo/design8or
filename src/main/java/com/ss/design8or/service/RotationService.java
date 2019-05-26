@@ -39,7 +39,7 @@ public class RotationService {
 				.build();
 		jobScheduler.scheduleJob(jobDetail, trigger);
 	}
-	
+	//TODO use single method to schedule and reschedule rotation jobs
 	public void rescheduleRotation(LocalTime rotationTime) throws SchedulerException {
 		log.info("Rescheduling rotation, setting time to '{}'", formatRotationTime(rotationTime));
 		jobScheduler.rescheduleJob(TriggerKey.triggerKey("rotationTrigger","design8orGroup"), createTrigger(rotationTime));

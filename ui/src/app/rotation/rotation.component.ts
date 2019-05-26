@@ -31,9 +31,7 @@ export class RotationComponent implements OnInit {
 
   ngOnInit() {
     this.parameterService.get()
-      .subscribe(parameter => {
-        this.parameter = parameter;
-      });
+      .subscribe(parameter => this.parameter = parameter);
   }
 
   saveRotationTime() {

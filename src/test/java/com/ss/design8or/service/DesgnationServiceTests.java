@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -157,7 +158,7 @@ public class DesgnationServiceTests {
 				.token("Vqiy3c3Z4uGm7rk8SECupeNKoOHeZ7") //<----- chopper.tonytony@onepiece.com
 				.build();
 		Designation designation = service.processDesignationResponse(response);
-		verify(notificationService, times(1)).emitDesignationEvent(any(Designation.class), any());
+		verify(notificationService, times(1)).emitDesignationEvent(eq(designation), any());
 		assertThat(designation.getStatus()).isEqualByComparingTo(DesignationStatus.DECLINED);
 	}
 	

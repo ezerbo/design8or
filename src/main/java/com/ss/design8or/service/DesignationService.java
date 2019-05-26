@@ -53,12 +53,16 @@ public class DesignationService {
 	}
 	
 	/**
-	 * Designate user as lead
-	 * @param user
+	 * Designate user as lead.
+	 * 
+	 * @param user User to be designated
+	 * 
+	 * @return Designated user
 	 */
 	public User designate(User user) {
 		final long userId = user.getId();
-		user = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(userId));
+		user = userRepository.findById(user.getId())
+				.orElseThrow(() -> new UserNotFoundException(userId));
 		designationRepository.findCurrent().map(d -> d.reassign()).map(d -> designationRepository.save(d)); //<--- reassign() sets status to 'REASSINGED' and nullify token
 		Designation designation = Designation.builder()
 				.user(user)
@@ -68,6 +72,13 @@ public class DesignationService {
 		return user;
 	}
 	
+	/**
+	 * Process a designation response. Events are emitted is all cases (designation accepted, declined)
+	 * 
+	 * @param designationResponse Designation response to be processed
+	 * 
+	 * @return Processed designation
+	 */
 	public Designation processDesignationResponse(DesignationResponse designationResponse) {
 		log.info("Processing designation response {}", designationResponse);
 		Designation designation = getDesignationFromResponse(designationResponse);
@@ -75,28 +86,47 @@ public class DesignationService {
 			Assignment assignment = assignmentService.create(designation.accept().getUser(), getCurrentPool());
 			designation.token(null);
 			notificationService.emitAssignmentEvent(assignment);
-		} else if(!designation.isDeclined()) { // If designation has not already been declined
-			designation.decline();
+		} else if(!designation.isDeclined()) { // If designation has not already been declined. Designation might have previously been declined.
+			designation.decline();//TODO Do not set designation status to declined when a request is stale and has not been declined by the user it was assigned to
 			List<User> candidates = userRepository.getCurrentPoolCandidates();
 			notificationService.emitDesignationEvent(designation, candidates);//Broadcast to all users
 		}
 		return designationRepository.save(designation);
 	}
 	
+	/**
+	 * Finds the designation request related to the token from the response.
+	 * If the records is not found (can happen when a request have been broadcasted and a user other than the one designated accepts it)
+	 * a designation that is current and has been declined is returned.
+	 * 
+	 * @param designationResponse Response to parse designation from
+	 * 
+	 * @return Designation
+	 */
 	private Designation getDesignationFromResponse(DesignationResponse designationResponse) {
 		validateResponse(designationResponse.getResponse());
 		User user = userRepository.findByEmailAddress(designationResponse.getEmailAddress())
 				.orElseThrow(() -> new UserNotFoundException(designationResponse.getEmailAddress()));
 		Designation designation = user.getDesignations().stream()
-				.filter(d -> d.isPending() && Objects.equals(d.getToken(), designationResponse.getToken())).findAny()
-				.orElse(designationRepository.findCurrentAndDeclined()); //If user has not been designated, find a designation that's current and has been declined
+				.filter(d -> d.isPending() && Objects.equals(d.getToken(), designationResponse.getToken())).findAny() //TODO include filter to SQL Query
+				.orElse(designationRepository.findStaleOrDeclined()); //If user has not been designated, find a designation that's current and has been declined
 		if(Objects.isNull(designation)) {
-			throw new DesignationNotFoundException();
+			throw new DesignationNotFoundException(); // When users click on designations that have already been accepted.
 		}
 		designation.setUser(user); //User whose email address is in the response.
 		return designation;
 	}
 	
+	public Designation getCurrent() {
+		return designationRepository.findCurrent()
+				.orElseThrow(() -> new DesignationNotFoundException());
+	}
+	
+	/**
+	 * Returns the ongoing pool.
+	 * 
+	 * @return Current Pool
+	 */
 	private Pool getCurrentPool() {
 		Optional<Pool> poolOp = poolRepository.findCurrent();
 		if(poolOp.isPresent()) {
@@ -105,8 +135,12 @@ public class DesignationService {
 		return poolRepository.save(new Pool());
 	}
 	
+	
 	/**
-	 * Designate new lead
+	 * Designates the next lead. Typically called by a scheduled Job
+	 * The pool of candidates is sorted alphabetically and the first user is chosen.
+	 * 
+	 * @return Designated user
 	 */
 	public User designate() {
 		log.info("Designating next lead...");
@@ -126,6 +160,11 @@ public class DesignationService {
 		return lead;
 	}
 	
+	/**
+	 * Validates that the designation has either been accepted or declined
+	 * 
+	 * @param response Designation response to be validated
+	 */
 	private void validateResponse(String response) {
 		if(!(ACCEPT_RESPONSE.equalsIgnoreCase(response) || DECLINE_RESPONSE.equalsIgnoreCase(response))) {
 			throw new InvalidDesignationResponseException(response);

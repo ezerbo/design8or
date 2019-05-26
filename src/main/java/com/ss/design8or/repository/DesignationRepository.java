@@ -16,6 +16,6 @@ public interface DesignationRepository extends JpaRepository<Designation, Long> 
 	@Query("from Designation d where d.token is not null")
 	Optional<Designation> findCurrent();
 	
-	@Query("from Designation d where d.token is not null and d.status='DECLINED'")
-	Designation findCurrentAndDeclined();
+	@Query("from Designation d where d.token is not null and (d.status='DECLINED' or d.status='STALED')")
+	Designation findStaleOrDeclined();
 }
