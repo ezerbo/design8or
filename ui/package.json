@@ -29,7 +29,7 @@
     "amazing-time-picker": "^1.8.0",
     "bootstrap": "^4.2.1",
     "core-js": "^2.5.4",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "moment": "^2.23.0",
     "ngx-spinner": "^6.1.2",
     "popper.js": "^1.14.6",
