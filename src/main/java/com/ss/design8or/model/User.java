@@ -35,7 +35,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(exclude = {"assignments", "designations"})
 @EqualsAndHashCode(exclude = {"assignments", "designations"})
-@Table(name = "user", catalog = "desig8or_db",
+@Table(name = "user", catalog = "design8or_db",
 uniqueConstraints = { @UniqueConstraint(columnNames = "email_address") })
 public class User implements Serializable {
 	

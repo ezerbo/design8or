@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "designation", catalog = "desig8or_db")
+@Table(name = "designation", catalog = "design8or_db")
 public class Designation {
 
 	@Id

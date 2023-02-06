@@ -18,9 +18,9 @@ import com.ss.design8or.model.User;
 @Service
 public class NotificationService {
 	
-	private EmailNotificationService mailService;
-	private PushNotificationService pushNotificationService;
-	private WebSocketNotificationService webSocketNotificationService;
+	private final EmailNotificationService mailService;
+	private final PushNotificationService pushNotificationService;
+	private final WebSocketNotificationService webSocketNotificationService;
 	
 	public NotificationService(EmailNotificationService mailService,
 			PushNotificationService pushNotificationService, WebSocketNotificationService webSocketNotificationService) {
@@ -42,7 +42,7 @@ public class NotificationService {
 	
 	@Async
 	public void emitDesignationEvent(Designation designation, List<User> candidates) {
-		candidates.stream()
+		candidates
 		.forEach(candidate -> {
 			mailService.sendDesignationEvent(designation, candidate); //Broadcast to all users but the one who declined
 		});

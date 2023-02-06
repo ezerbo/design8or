@@ -24,7 +24,7 @@ import com.ss.design8or.service.job.StaleRequestHandlerTimer;
 @Configuration
 public class Config extends WebSecurityConfigurerAdapter {
 	
-	private CorsConfiguration config;
+	private final CorsConfiguration config;
 
 	public Config(ServiceProperties properties) {
 		this.config = properties.getCors();
@@ -32,7 +32,7 @@ public class Config extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.httpBasic().disable()
+		http.httpBasic().disable()// Disabling this for time being
 		.headers()
 			.frameOptions().sameOrigin()
 		.and()

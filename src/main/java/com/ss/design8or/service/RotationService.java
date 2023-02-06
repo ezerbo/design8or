@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class RotationService {
 
-	private Scheduler jobScheduler;
+	private final Scheduler jobScheduler;
 	
 	public RotationService(Scheduler jobScheduler) {
 		this.jobScheduler = jobScheduler;

@@ -1,6 +1,7 @@
 package com.ss.design8or.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import com.ss.design8or.repository.UserRepository;
 @Service
 public class UserService {
 
-	private UserRepository repository;
+	private final UserRepository repository;
 	
 	public UserService(UserRepository repository) {
 		this.repository = repository;
@@ -31,7 +32,7 @@ public class UserService {
 	
 	public User update(User user) {
 		Optional<User> existingUserOp = repository.findByEmailAddress(user.getEmailAddress());
-		if(existingUserOp.isPresent() && (user.getId() != existingUserOp.get().getId())) {
+		if(existingUserOp.isPresent() && (!Objects.equals(user.getId(), existingUserOp.get().getId()))) {
 			throw new EmailAddressInUseException(user.getEmailAddress());
 		}
 		User existingUser = repository.findById(user.getId())

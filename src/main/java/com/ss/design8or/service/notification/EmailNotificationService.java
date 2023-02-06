@@ -37,9 +37,9 @@ class EmailNotificationService {
     private static final String DESIGNATION_RESPONSE_URL = "reponseUrl";
     private static final String YEAR = "year";
     
-    private ServiceProperties properties;
-    private JavaMailSenderImpl javaMailSender;
-    private SpringTemplateEngine templateEngine;
+    private final ServiceProperties properties;
+    private final JavaMailSenderImpl javaMailSender;
+    private final SpringTemplateEngine templateEngine;
     
     public EmailNotificationService(ServiceProperties properties, JavaMailSenderImpl javaMailSender,
     		SpringTemplateEngine templateEngine) {
@@ -49,7 +49,7 @@ class EmailNotificationService {
 	}
     
     @Async
-    private void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+    void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);

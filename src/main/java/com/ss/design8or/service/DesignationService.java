@@ -1,5 +1,6 @@
 package com.ss.design8or.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public class DesignationService {
 		final long userId = user.getId();
 		user = userRepository.findById(user.getId())
 				.orElseThrow(() -> new UserNotFoundException(userId));
-		designationRepository.findCurrent().map(d -> d.reassign()).map(d -> designationRepository.save(d)); //<--- reassign() sets status to 'REASSINGED' and nullify token
+		designationRepository.findCurrent().map(Designation::reassign).map(d -> designationRepository.save(d)); //<--- reassign() sets status to 'REASSINGED' and nullify token
 		Designation designation = Designation.builder()
 				.user(user)
 				.build();
@@ -119,7 +120,7 @@ public class DesignationService {
 	
 	public Designation getCurrent() {
 		return designationRepository.findCurrent()
-				.orElseThrow(() -> new DesignationNotFoundException());
+				.orElseThrow(DesignationNotFoundException::new);
 	}
 	
 	/**
@@ -129,10 +130,7 @@ public class DesignationService {
 	 */
 	private Pool getCurrentPool() {
 		Optional<Pool> poolOp = poolRepository.findCurrent();
-		if(poolOp.isPresent()) {
-			return poolOp.get();
-		}
-		return poolRepository.save(new Pool());
+		return poolOp.orElseGet(() -> poolRepository.save(new Pool()));
 	}
 	
 	
@@ -151,7 +149,7 @@ public class DesignationService {
 			Pool pool = poolRepository.save(new Pool());//start new pool
 			//Each user in the entire user base can be assigned a task
 			candidates = userRepository.findAll().stream()
-					.sorted((u, v) -> u.getLastName().compareTo(v.getLastName()))
+					.sorted(Comparator.comparing(User::getLastName))
 					.collect(Collectors.toList());
 			notificationService.emitPoolCreationEvent(pool); //<--- Broadcast pool creation event
 		}

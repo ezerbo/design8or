@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.User;
-import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.service.UserService;
 
 /**
@@ -26,13 +25,10 @@ import com.ss.design8or.service.UserService;
 @RequestMapping("/users")
 public class UserResource {
 
-	private UserService service;
-	private DesignationRepository designationRepository;
-	
-	public UserResource(UserService service,
-			DesignationRepository designationRepository) {
+	private final UserService service;
+
+	public UserResource(UserService service) {
 		this.service = service;
-		this.designationRepository = designationRepository;
 	}
 	
 	@GetMapping
@@ -40,42 +36,18 @@ public class UserResource {
 		return ResponseEntity.ok(service.getAll());
 	}
 	
-	@GetMapping("/candidates")
-	public ResponseEntity<List<User>> getNextCandidates() {
-		return ResponseEntity.ok(service.getCurrentPoolCandidates());
-	}
-	
-	@GetMapping("/lead")
-	public ResponseEntity<User> getLeadUser() {
-		return service.getCurrentLead()
-				.map(lead -> ResponseEntity.ok(lead))
-				.orElse(ResponseEntity.notFound().build());
-	}
-	
-	@GetMapping("/designated")
-	public ResponseEntity<User> getDesignatedUser() {
-		return designationRepository.findCurrent()
-				.map(d -> ResponseEntity.ok(d.getUser()))
-				.orElse(ResponseEntity.notFound().build());
-	}
-	
 	@PostMapping
 	public ResponseEntity<?> create(@RequestBody User user) {
 		if(Objects.nonNull(user.getId())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		user =	service.create(user);
-		return ResponseEntity.ok(user);
+		return ResponseEntity.ok(service.create(user));
 	}
 	
-	@PutMapping
-	public ResponseEntity<?> update(@RequestBody User user) {
-		final long userId = user.getId();
-		if(Objects.isNull(userId)) {
-			return create(user);
-		}
-		user = service.update(user);
-		return ResponseEntity.ok(user);
+	@PutMapping("/{id}")
+	public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
+		user.setId(id);
+		return ResponseEntity.ok(service.update(user));
 	}
 	
 	@DeleteMapping("/{id}")

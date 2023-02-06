@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubscriptionDTO {
-
 	private String endpoint;
-	
 	private SubscriptionKey keys;
 	
 	public Subscription toSubscription() {

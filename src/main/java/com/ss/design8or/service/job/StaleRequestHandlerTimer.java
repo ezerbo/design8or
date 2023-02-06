@@ -20,11 +20,11 @@ public class StaleRequestHandlerTimer {
 	
 	private Timer timer;
 	
-	private Parameter parameter;
+	private final Parameter parameter;
 
-	private StaleRequestHandlerTask handlerTask;
+	private final StaleRequestHandlerTask handlerTask;
 	
-	private DesignationService designationService;
+	private final DesignationService designationService;
 	
 	public StaleRequestHandlerTimer(StaleRequestHandlerTask handlerTask,
 			ParameterService parameterService, DesignationService designationService) {

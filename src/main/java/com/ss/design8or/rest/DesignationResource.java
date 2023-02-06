@@ -21,8 +21,8 @@ import com.ss.design8or.service.DesignationService;
 @RequestMapping("/designations")
 public class DesignationResource {
 
-	private DesignationService service;
-	private DesignationRepository repository;
+	private final DesignationService service;
+	private final DesignationRepository repository;
 
 	public DesignationResource(DesignationService service, DesignationRepository repository) {
 		this.service = service;
@@ -31,8 +31,7 @@ public class DesignationResource {
 
 	@PostMapping
 	public ResponseEntity<?> assignManually(@RequestBody User user) {
-		service.designate(user);
-		return ResponseEntity.ok(user);
+		return ResponseEntity.ok(service.designate(user));
 	}
 	
 	@PostMapping("/response") //TODO use /designations/{id}/response
@@ -41,10 +40,10 @@ public class DesignationResource {
 		return ResponseEntity.ok(designation);
 	}
 	
-	@GetMapping("/current")
+	@GetMapping( "/current")
 	public ResponseEntity<Designation> findCurrent() {
 		return repository.findCurrent()
-					.map(d -> ResponseEntity.ok(d))
+					.map(ResponseEntity::ok)
 					.orElse(ResponseEntity.notFound().build());
 	}
 }

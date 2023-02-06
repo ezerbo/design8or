@@ -1,9 +1,8 @@
 package com.ss.design8or.rest;
 
-import java.util.Optional;
-
+import com.ss.design8or.model.User;
+import com.ss.design8or.repository.DesignationRepository;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +13,8 @@ import com.ss.design8or.model.Pools;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
 
+import java.util.List;
+
 /**
  * @author ezerbo
  *
@@ -22,35 +23,55 @@ import com.ss.design8or.repository.UserRepository;
 @RequestMapping("/pools")
 public class PoolResource {
 	
-	private PoolRepository repository;
+	private final PoolRepository repository;
 	
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
+
+	private final DesignationRepository designationRepository;
 	
-	public PoolResource(PoolRepository repository, UserRepository userRepository) {
+	public PoolResource(PoolRepository repository, UserRepository userRepository,
+						DesignationRepository designationRepository) {
 		this.repository = repository;
 		this.userRepository = userRepository;
+		this.designationRepository = designationRepository;
 	}
 	
 	@GetMapping
 	public ResponseEntity<Pools> pools() {
-		Pageable page = PageRequest.of(0, 2);
 		Pool currentPool = getCurrentPool();
+		long currentPoolAssignmentsCount = currentPool.getAssignments().size();
 		Pools pools = Pools.builder()
 				.current(currentPool)
-				.past(repository.findPast(page).getContent())
-				.currentPoolProgress(calculateProgress(currentPool.getAssignments().size()))
-				.currentPoolParticipantsCount((long) currentPool.getAssignments().size())
+				.past(repository.findPast(PageRequest.of(0, 2)).getContent())
+				.currentPoolProgress(calculateProgress(currentPoolAssignmentsCount))
+				.currentPoolParticipantsCount(currentPoolAssignmentsCount)
 				.build();
 		return ResponseEntity.ok(pools);
 	}
+
+	@GetMapping("/current/candidates")
+	public ResponseEntity<List<User>> getNextCandidates() {
+		return ResponseEntity.ok(userRepository.getCurrentPoolCandidates());
+	}
+
+	@GetMapping("/current/lead")
+	public ResponseEntity<User> getLeadUser() {
+		return userRepository.findByLeadTrue()
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@GetMapping("/current/designated")
+	public ResponseEntity<User> getDesignatedUser() {
+		return designationRepository.findCurrent()
+				.map(d -> ResponseEntity.ok(d.getUser()))
+				.orElse(ResponseEntity.notFound().build());
+	}
 	
 	private Pool getCurrentPool() {
-		Optional<Pool> current = repository.findCurrent();
-		if(current.isPresent()) {
-			return current.get();
-		}
-		return repository.save(new Pool());
-	}	
+		return repository.findCurrent()
+				.orElseGet(() -> repository.save(new Pool()));
+	}
 	
 	private long calculateProgress(long currentPoolParticipantsCount) {
 		long totalNumberOfUsers = userRepository.count();

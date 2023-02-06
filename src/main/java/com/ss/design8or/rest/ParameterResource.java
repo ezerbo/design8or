@@ -23,9 +23,9 @@ import com.ss.design8or.service.notification.NotificationService;
 @RequestMapping("/parameters")
 public class ParameterResource {
 
-	private ParameterService service;
-	private RotationService rotationService;
-	private NotificationService notificationService;
+	private final ParameterService service;
+	private final RotationService rotationService;
+	private final NotificationService notificationService;
 
 	public ParameterResource(ParameterService service,
 			RotationService rotationService, NotificationService notificationService) {
@@ -36,9 +36,7 @@ public class ParameterResource {
 
 	@GetMapping
 	public ResponseEntity<?> get() {
-		return service.getOptionalParamter()
-				.map(p -> ResponseEntity.ok(p))
-				.orElse(ResponseEntity.notFound().build());
+		return ResponseEntity.ok(service.getParameter());
 	}
 
 	@PutMapping
@@ -51,6 +49,5 @@ public class ParameterResource {
 		notificationService.emitParametersUpdateEvent(parameter);
 		return ResponseEntity.ok(parameter);
 	}
-	
 	
 }

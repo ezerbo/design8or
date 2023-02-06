@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "app_parameter", catalog = "desig8or_db")
+@Table(name = "app_parameter", catalog = "design8or_db")
 public class Parameter {
 	
 	@Id

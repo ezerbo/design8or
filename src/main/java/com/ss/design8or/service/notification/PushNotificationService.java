@@ -34,10 +34,10 @@ import nl.martijndwars.webpush.PushService;
 @Service
 class PushNotificationService {
 	
-	private KeysConfig keys;
+	private final KeysConfig keys;
 	private PushService pushService;
-	private ObjectMapper objectMapper;
-	private SubscriptionRepository subscriptionRepository;
+	private final ObjectMapper objectMapper;
+	private final SubscriptionRepository subscriptionRepository;
 	
 	public PushNotificationService(ServiceProperties properties, ObjectMapper objectMapper,
 			SubscriptionRepository subscriptionRepository) {
@@ -56,7 +56,7 @@ class PushNotificationService {
 	public void sendAssignmentEvent(User lead) {
 		subscriptionRepository.findAll().stream()
 			.map(s -> toNotification(s, getAssignmentEventPayload(lead)))
-			.forEach(s -> sendAsync(s));
+			.forEach(this::sendAsync);
 	}
 
 	private void sendAsync(Notification notification) {
@@ -97,7 +97,7 @@ class PushNotificationService {
 	private NotificationData getNotificationData() {
 		return NotificationData.builder()
 				.dateOfArrival(LocalDateTime.now())
-				.primaryKey(1l)
+				.primaryKey(1L)
 				.build();
 	}
 }

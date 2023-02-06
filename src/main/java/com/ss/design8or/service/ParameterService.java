@@ -1,7 +1,5 @@
 package com.ss.design8or.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +15,7 @@ import com.ss.design8or.repository.ParameterRepository;
 @Transactional
 public class ParameterService {
 
-	private ParameterRepository repository;
+	private final ParameterRepository repository;
 	
 	public ParameterService(ParameterRepository repository) {
 		this.repository = repository;
@@ -27,14 +25,7 @@ public class ParameterService {
 	public Parameter getParameter() {
 		return repository.findAll()
 				.stream()
-				.findFirst().orElseThrow(() -> new ParametersNotFoundException());
-	}
-	
-	@Transactional(readOnly = true)
-	public Optional<Parameter> getOptionalParamter() {
-		return repository.findAll()
-				.stream()
-				.findFirst();
+				.findFirst().orElseThrow(ParametersNotFoundException::new);
 	}
 	
 	public Parameter save(Parameter parameter) {

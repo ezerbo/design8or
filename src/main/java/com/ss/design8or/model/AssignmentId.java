@@ -1,6 +1,7 @@
 package com.ss.design8or.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -34,7 +35,7 @@ public class AssignmentId implements Serializable {
 		if (this == other) return true;
 		if (!(other instanceof AssignmentId)) return false;
 		AssignmentId castOther = (AssignmentId)other;
-		return (this.poolId == castOther.poolId) && (this.userId == castOther.userId);
+		return (Objects.equals(this.poolId, castOther.poolId)) && (Objects.equals(this.userId, castOther.userId));
 	}
 	
 	@Override
