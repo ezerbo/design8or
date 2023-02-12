@@ -64,4 +64,8 @@ public class Pool {
 		setEndDate(new Date());
 		return this;
 	}
+
+	public boolean isClosed() {
+		return endDate != null;
+	}
 }

@@ -1,6 +1,6 @@
 package com.ss.design8or.rest;
 
-import com.ss.design8or.model.User;
+import com.ss.design8or.model.*;
 import com.ss.design8or.repository.DesignationRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.design8or.model.Pool;
-import com.ss.design8or.model.Pools;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
 
@@ -47,6 +45,26 @@ public class PoolResource {
 				.currentPoolParticipantsCount(currentPoolAssignmentsCount)
 				.build();
 		return ResponseEntity.ok(pools);
+	}
+
+	@GetMapping("/stats") //TODO Handle case where there's no lead for a newly created pool
+	public ResponseEntity<PoolStats> stats() {
+		Pool currentPool = getCurrentPool();
+		PoolStats stats = PoolStats.builder()
+				.count(repository.findAll().size())
+				.currentPool(PoolDTO.builder()
+						.id(currentPool.getId())
+						.startDate(currentPool.getStartDate())
+						.endDate(currentPool.getEndDate())
+						.lead(userRepository.findByLeadTrue()
+								.map(user -> UserDTO.builder() // TODO Add lead details
+										.firstName(user.getFirstName())
+										.lastName(user.getLastName())
+										.emailAddress(user.getEmailAddress())
+										.build()))
+						.build())
+				.build();
+		return ResponseEntity.ok(stats);
 	}
 
 	@GetMapping("/current/candidates")
