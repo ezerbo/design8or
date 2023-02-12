@@ -59,7 +59,7 @@ public class Designation {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@Column(name = "token", unique = false)
+	@Column(name = "token")
 	private String token;
 	
 	public Designation status(DesignationStatus status) {
