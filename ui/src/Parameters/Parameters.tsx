@@ -1,14 +1,17 @@
 import React from "react";
-import { Footer } from "../Footer/Footer";
-import { Header } from "../Header/Header";
+import {Card, Divider} from "@fluentui/react-components";
+import styles from "../Parameters/Parameters.module.css";
+import {SettingsCogMultiple24Regular} from "@fluentui/react-icons";
 
 export const Parameters: React.FunctionComponent = () => {
 
     return (
         <div>
-            <Header />
-            Parameters
-            <Footer />
+            <div>
+                <Card className={styles.card}>
+                    <Divider><SettingsCogMultiple24Regular /></Divider>
+                </Card>
+            </div>
         </div>
     );
 };

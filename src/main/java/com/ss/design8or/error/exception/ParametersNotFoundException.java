@@ -1,4 +1,4 @@
-package com.ss.design8or.error;
+package com.ss.design8or.error.exception;
 
 /**
  * Thrown when parameters are missing in the database.

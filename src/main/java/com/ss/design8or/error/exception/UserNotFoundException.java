@@ -1,4 +1,4 @@
-package com.ss.design8or.error;
+package com.ss.design8or.error.exception;
 
 /**
  * @author ezerbo

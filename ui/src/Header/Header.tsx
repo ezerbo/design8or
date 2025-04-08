@@ -1,67 +1,12 @@
 import * as React from 'react';
-import {CommandBar, ICommandBarItemProps} from '@fluentui/react/lib/CommandBar';
-import {FocusTrapZone} from '@fluentui/react/lib/FocusTrapZone';
-import {initializeIcons} from '@fluentui/react';
+import {Divider, ToolbarProps} from "@fluentui/react-components";
+import {PersonClockRegular} from "@fluentui/react-icons";
 
-initializeIcons();
 
-export const Header: React.FunctionComponent = () => {
-
-    const [enableFocusTrap] = React.useState(false);
-
+export const Header = (props: Partial<ToolbarProps>) => {
     return (
-        <FocusTrapZone disabled={!enableFocusTrap}>
-            <CommandBar
-                items={_items}
-                farItems={_farItems}
-                ariaLabel="Inbox actions"
-                primaryGroupAriaLabel="Pool Icons"
-                farItemsGroupAriaLabel="About"
-            />
-        </FocusTrapZone>
+        <div>
+            <Divider><PersonClockRegular style={{ fontSize: '100px', marginRight: '10px' }} /></Divider>
+        </div>
     );
 };
-
-const _items: ICommandBarItemProps[] = [
-    {
-        key: 'home',
-        text: 'Home',
-        iconProps: {iconName: 'Home'},
-        href: "/"
-    },
-    {
-        key: 'parameters',
-        text: 'Parameters',
-        iconProps: {iconName: 'Processing'},
-        href: "/parameters"
-    },
-    {
-        key: 'users',
-        text: 'Users',
-        iconProps: {iconName: 'FabricUserFolder'},
-        href: "/users"
-    },
-    {
-        key: 'pools',
-        text: 'Pools',
-        iconProps: {iconName: 'Sprint'},
-        href: "/pools"
-    },
-    {
-        key: 'designations',
-        text: 'Designations',
-        iconProps: {iconName: 'Teamwork'},
-        href: "/designations"
-    }
-];
-
-const _farItems: ICommandBarItemProps[] = [
-    {
-        key: 'info',
-        text: 'Info',
-        ariaLabel: 'Info',
-        iconOnly: true,
-        iconProps: {iconName: 'Info'},
-        onClick: () => console.log('App Info'),
-    }
-];

@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Design8or } from './Design8or';
-import { mergeStyles } from '@fluentui/react';
+import {createRoot} from 'react-dom/client';
+import {Design8or} from './Design8or';
+import {FluentProvider, makeStyles, webLightTheme} from '@fluentui/react-components';
 import reportWebVitals from './reportWebVitals';
 
 // Inject some global styles
-mergeStyles({
+makeStyles({
   ':global(body,html,#root)': {
     margin: 0,
     padding: 0,
@@ -13,7 +13,14 @@ mergeStyles({
   },
 });
 
-ReactDOM.render(<Design8or />, document.getElementById('root'));
+// @ts-ignore
+const root = createRoot(document.getElementById('root'));
+
+root.render(
+    <FluentProvider theme={webLightTheme}>
+      <Design8or />
+    </FluentProvider>,
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

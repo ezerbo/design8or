@@ -3,7 +3,7 @@ package com.ss.design8or.service.job;
 import java.util.Date;
 import java.util.Timer;
 
-import com.ss.design8or.error.DesignationNotFoundException;
+import com.ss.design8or.error.exception.DesignationNotFoundException;
 import com.ss.design8or.model.Designation;
 import com.ss.design8or.model.Parameter;
 import com.ss.design8or.service.DesignationService;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class StaleRequestHandlerTimer {
+public class StaleRequestHandler {
 	
 	private Timer timer;
 	
@@ -26,8 +26,8 @@ public class StaleRequestHandlerTimer {
 	
 	private final DesignationService designationService;
 	
-	public StaleRequestHandlerTimer(StaleRequestHandlerTask handlerTask,
-			ParameterService parameterService, DesignationService designationService) {
+	public StaleRequestHandler(StaleRequestHandlerTask handlerTask,
+							   ParameterService parameterService, DesignationService designationService) {
 		this.handlerTask = handlerTask;
 		this.designationService = designationService;
 		parameter = parameterService.getParameter();

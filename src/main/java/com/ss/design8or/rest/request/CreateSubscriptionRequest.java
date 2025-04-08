@@ -1,5 +1,6 @@
-package com.ss.design8or.model;
+package com.ss.design8or.rest.request;
 
+import com.ss.design8or.model.Subscription;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubscriptionDTO {
+public class CreateSubscriptionRequest {
+
 	private String endpoint;
+
 	private SubscriptionKey keys;
 	
 	public Subscription toSubscription() {

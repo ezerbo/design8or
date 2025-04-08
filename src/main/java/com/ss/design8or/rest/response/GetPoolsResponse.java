@@ -1,7 +1,8 @@
-package com.ss.design8or.model;
+package com.ss.design8or.rest.response;
 
 import java.util.List;
 
+import com.ss.design8or.model.Pool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +16,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pools {
+public class GetPoolsResponse {
 	
 	private Pool current;
 	
 	private List<Pool> past;
 	
-	private Long currentPoolProgress;
+	private Long progress;
 	
-	private Long currentPoolParticipantsCount;
+	private Long participantsCount;
 
 }

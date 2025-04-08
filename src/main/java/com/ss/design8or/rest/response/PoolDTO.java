@@ -1,12 +1,12 @@
-package com.ss.design8or.model;
+package com.ss.design8or.rest.response;
 
+import com.ss.design8or.rest.DesignationResource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.Optional;
 
 @Data
 @Builder
@@ -14,11 +14,15 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PoolDTO {
 
-    private Long id;
+    private long id;
+
+    private long progress;
+
+    private long participantsCount;
 
     private Date startDate;
 
     private Date endDate;
 
-    private Optional<UserDTO> lead;
+    private DesignationResource.UserDTO lead;
 }

@@ -1,0 +1,23 @@
+.horizontalLayout {
+    display: flex;
+    justify-content: space-between; /* Adjusts space between items */
+    gap: 16px; /* Adds space between PoolStats and Users */
+    align-items: center; /* Aligns items vertically in the center */
+}
+
+.card {
+    margin: 10px;
+    max-width: 100%;
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+.controlButtons {
+    margin-top: 10px;
+}
+
+.controlButton {
+    margin-right: 5px;
+}

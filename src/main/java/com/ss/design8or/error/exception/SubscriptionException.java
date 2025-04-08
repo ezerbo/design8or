@@ -1,14 +1,14 @@
-package com.ss.design8or.error;
+package com.ss.design8or.error.exception;
 
 /**
  * @author ezerbo
  *
  */
-public class SubscriptionExistException extends RuntimeException {
+public class SubscriptionException extends RuntimeException {
 
 	private static final long serialVersionUID = -5508114927757126772L;
 	
-	public SubscriptionExistException() {
+	public SubscriptionException() {
 		super("Subscription already exists");
 	}
 

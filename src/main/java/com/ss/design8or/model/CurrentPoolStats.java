@@ -1,5 +1,6 @@
 package com.ss.design8or.model;
 
+import com.ss.design8or.rest.response.PoolDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,13 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class CurrentPoolStats {
 
-    private Long id;
+    private long count;
 
-    private String firstName;
+    private PoolDTO pool;
 
-    private String lastName;
-
-    private String emailAddress;
 }

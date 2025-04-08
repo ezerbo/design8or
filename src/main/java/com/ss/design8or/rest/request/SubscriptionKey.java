@@ -1,4 +1,4 @@
-package com.ss.design8or.model;
+package com.ss.design8or.rest.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
