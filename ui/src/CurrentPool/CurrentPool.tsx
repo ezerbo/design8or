@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import style from "./PoolStats.module.css"
+import style from "./CurrentPool.module.css"
 import {Card, Divider, makeStyles, ProgressBar, Spinner, Tooltip} from "@fluentui/react-components";
 import {PeopleAudience32Regular, PersonSupport32Regular, SlideTextPerson32Regular} from "@fluentui/react-icons";
-import axios from "axios";
-import {api_base_url, handleErrors} from "../../commons/http.util";
+import {httpGet} from "../Commons/Http.util";
 import {CurrentPoolStats} from "./CurrentPoolStats";
-import {Designation} from "../../Designations/Designation";
+import {Designation} from "../Designations/Designation";
+import {CURRENT_DESIGNATIONS_URL, POOL_STATS_URL} from "../Commons/Paths";
 
 const useStyles = makeStyles({
     card: {
@@ -18,39 +18,17 @@ const useStyles = makeStyles({
     }
 });
 
-export const PoolStats: React.FunctionComponent = () => {
+export const CurrentPool: React.FunctionComponent = () => {
 
     const [stats, setStats] = useState<CurrentPoolStats>();
     const [designation, setDesignation] = useState<Designation>();
 
-    const getStats = () => {
-        axios({
-            url: `${api_base_url}/pools/stats`,
-            method: 'GET',
-            headers: {'Accept': 'application/json'}
-        })
-            .then(res => handleErrors(res))
-            .then(res => {
-                setStats(res.data);
-            });
-    }
-
-    const getCurrentDesignation = () => {
-        axios({
-            url: `${api_base_url}/designations/current`,
-            method: 'GET',
-            headers: {'Accept': 'application/json'}
-        })
-            .then(res => handleErrors(res))
-            .then(res => {
-                setDesignation(res.data);
-            });
-    }
-
-
     useEffect(() => {
-        getStats();
-        getCurrentDesignation();
+        httpGet<CurrentPoolStats>(POOL_STATS_URL)
+            .then((stats) => { setStats(stats); });
+
+        httpGet<Designation>(CURRENT_DESIGNATIONS_URL)
+            .then(designation => setDesignation(designation));
     }, []);
 
     const styles = useStyles();
@@ -91,7 +69,6 @@ export const PoolStats: React.FunctionComponent = () => {
                 <Divider/>
                 {designation && <span>Status: {designation.status}</span>}
             </Card>
-
 
             <Card className={styles.card}>
                 <Tooltip content="Pools" relationship="label">

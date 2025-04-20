@@ -8,26 +8,30 @@ spring:
         database: H2
         show-sql: false
         properties:
-            hibernate.cache.use_second_level_cache: true
-            hibernate.cache.use_query_cache: false
+          #  hibernate.cache.use_second_level_cache: true
+          #  hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
         hibernate: 
             ddl-auto: create-drop
+        defer-datasource-initialization: true
   quartz: 
      jdbc: 
        initialize-schema: NEVER
   
   datasource:
-        url: jdbc:h2:mem:design8or_db;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=create schema if not exists design8or_db;
+        url: jdbc:h2:mem:design8or_db;MODE=MYSQL;NON_KEYWORDS=user;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=create schema if not exists design8or_db;
         username: sa
-        password: 
-        data: classpath:data/data.sql
-   
+        password:
+
   mail: 
     host: localhost 
     port: 25 
     username: changeit
     password: changeit
+  sql:
+    init:
+      data-locations: classpath:data/data.sql
+
 
 app:
   cors:

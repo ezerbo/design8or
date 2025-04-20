@@ -1,15 +1,15 @@
 package com.ss.design8or.service.notification;
 import java.time.LocalDate;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.CharEncoding;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import com.ss.design8or.config.ServiceProperties;
 import com.ss.design8or.model.Designation;
@@ -17,6 +17,7 @@ import com.ss.design8or.model.MailConfig;
 import com.ss.design8or.model.User;
 
 import lombok.extern.slf4j.Slf4j;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 /**
  * 
@@ -30,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-class EmailNotificationService {
+@RequiredArgsConstructor
+public class EmailNotificationService {
 
     private static final String USER = "user";
     private static final String DECLINED_DESIGNATION_USER = "declinedDesignationUser";
@@ -38,15 +40,11 @@ class EmailNotificationService {
     private static final String YEAR = "year";
     
     private final ServiceProperties properties;
+
     private final JavaMailSenderImpl javaMailSender;
+
     private final SpringTemplateEngine templateEngine;
-    
-    public EmailNotificationService(ServiceProperties properties, JavaMailSenderImpl javaMailSender,
-    		SpringTemplateEngine templateEngine) {
-    	this.javaMailSender = javaMailSender;
-    	this.templateEngine = templateEngine;
-    	this.properties = properties;
-	}
+
     
     @Async
     void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
@@ -76,7 +74,7 @@ class EmailNotificationService {
         String responseUrl = computeDesignationResponseUrl(designation.getToken(), candidate.getEmailAddress());
 		context.setVariable(DESIGNATION_RESPONSE_URL, responseUrl);
         context.setVariable(YEAR, LocalDate.now().getYear());
-        String content = null;
+        String content;
         if(designation.isDeclined()) {
         	context.setVariable(DECLINED_DESIGNATION_USER, designation.getUser());
         	content = templateEngine.process("designation-broadcast", context);

@@ -4,18 +4,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.ss.design8or.error.DesignationNotFoundException;
-import com.ss.design8or.error.InvalidDesignationResponseException;
-import com.ss.design8or.error.UserNotFoundException;
+import com.ss.design8or.error.exception.DesignationNotFoundException;
+import com.ss.design8or.error.exception.InvalidDesignationResponseException;
+import com.ss.design8or.error.exception.UserNotFoundException;
 import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.Designation;
-import com.ss.design8or.model.DesignationResponse;
+import com.ss.design8or.rest.response.DesignationResponse;
 import com.ss.design8or.model.Pool;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.DesignationRepository;
@@ -24,6 +22,7 @@ import com.ss.design8or.repository.UserRepository;
 import com.ss.design8or.service.notification.NotificationService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author ezerbo
@@ -32,26 +31,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DesignationService {
 	
 	private final static String ACCEPT_RESPONSE = "accept";
 	private final static String DECLINE_RESPONSE = "decline";
 	
-	private PoolRepository poolRepository;
-	private UserRepository userRepository;
-	private DesignationRepository designationRepository;
-	private NotificationService notificationService;
-	private AssignmentService assignmentService;
-	
-	public DesignationService(PoolRepository poolRepository, UserRepository userRepository,
-			DesignationRepository designationRepository, NotificationService notificationService,
-			AssignmentService assignmentService) {
-		this.poolRepository = poolRepository;
-		this.userRepository = userRepository;
-		this.designationRepository = designationRepository;
-		this.notificationService = notificationService;
-		this.assignmentService = assignmentService;
-	}
+	private final PoolRepository poolRepository;
+
+	private final UserRepository userRepository;
+
+	private final DesignationRepository designationRepository;
+
+	private final NotificationService notificationService;
+
+	private final AssignmentService assignmentService;
+
 	
 	/**
 	 * Designate user as lead.
@@ -150,7 +145,7 @@ public class DesignationService {
 			//Each user in the entire user base can be assigned a task
 			candidates = userRepository.findAll().stream()
 					.sorted(Comparator.comparing(User::getLastName))
-					.collect(Collectors.toList());
+					.toList();
 			notificationService.emitPoolCreationEvent(pool); //<--- Broadcast pool creation event
 		}
 		User lead = designate(candidates.get(0));

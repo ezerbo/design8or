@@ -1,5 +1,6 @@
 package com.ss.design8or.rest;
 
+import lombok.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.design8or.model.Designation;
-import com.ss.design8or.model.DesignationResponse;
+import com.ss.design8or.rest.response.DesignationResponse;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.service.DesignationService;
@@ -19,15 +20,12 @@ import com.ss.design8or.service.DesignationService;
  */
 @RestController
 @RequestMapping("/designations")
+@RequiredArgsConstructor
 public class DesignationResource {
 
 	private final DesignationService service;
-	private final DesignationRepository repository;
 
-	public DesignationResource(DesignationService service, DesignationRepository repository) {
-		this.service = service;
-		this.repository = repository;
-	}
+	private final DesignationRepository repository;
 
 	@PostMapping
 	public ResponseEntity<?> assignManually(@RequestBody User user) {
@@ -45,5 +43,20 @@ public class DesignationResource {
 		return repository.findCurrent()
 					.map(ResponseEntity::ok)
 					.orElse(ResponseEntity.notFound().build());
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UserDTO {
+
+		private Long id;
+
+		private String firstName;
+
+		private String lastName;
+
+		private String emailAddress;
 	}
 }

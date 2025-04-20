@@ -1,31 +1,27 @@
 package com.ss.design8or.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Date;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.Pool;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author ezerbo
  *
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class AssignmentServiceTests {
 	
@@ -40,13 +36,13 @@ public class AssignmentServiceTests {
 	
 	private AssignmentService service;
 	
-	@Before
+	@BeforeEach
 	public void init() {
 		service = new AssignmentService(userRepository, repository);
 	}
 
 	@Test
-	public void createAssignmentSetsUserAsLead() throws Exception {
+	public void createAssignmentSetsUserAsLead() {
 		User oldLead = userRepository.findByLeadTrue().get();
 		User user = userRepository.findById(3L).get();
 		Pool currentPool = poolRepository.findCurrent().get();

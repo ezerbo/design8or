@@ -1,13 +1,10 @@
 package com.ss.design8or;
 
+import com.ss.design8or.config.ServiceProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import com.ss.design8or.config.ServiceProperties;
 
 /**
  * @author ezerbo
@@ -16,13 +13,10 @@ import com.ss.design8or.config.ServiceProperties;
 @EnableScheduling
 @SpringBootApplication
 @EnableConfigurationProperties(value = { ServiceProperties.class })
-public class Design8orApp extends SpringBootServletInitializer {
+public class Design8orApp {
+
 	public static void main(String[] args) {
 		SpringApplication.run(Design8orApp.class, args);
 	}
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return builder.sources(Design8orApp.class);
-	}
 }

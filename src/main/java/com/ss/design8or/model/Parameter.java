@@ -1,26 +1,24 @@
 package com.ss.design8or.model;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import java.time.LocalTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
  * @author ezerbo
  *
  */
 @Data
-@Entity
+@jakarta.persistence.Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

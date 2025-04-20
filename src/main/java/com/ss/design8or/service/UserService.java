@@ -1,42 +1,54 @@
 package com.ss.design8or.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
-import com.ss.design8or.error.EmailAddressInUseException;
-import com.ss.design8or.error.UserNotFoundException;
+import com.ss.design8or.error.exception.EmailAddressInUseException;
+import com.ss.design8or.error.exception.UserNotFoundException;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.UserRepository;
+import com.ss.design8or.rest.request.CreateUserRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author ezerbo
  *
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
 	private final UserRepository repository;
 	
-	public UserService(UserRepository repository) {
-		this.repository = repository;
-	}
-	
-	public User create(User user) {
-		repository.findByEmailAddress(user.getEmailAddress())
-		.ifPresent(e -> { throw new EmailAddressInUseException(e.getEmailAddress()); });
+	public User create(CreateUserRequest request) {
+		if (repository.existsByEmailAddress(request.getEmailAddress())) {
+			log.error("Email address already in use");
+			throw new EmailAddressInUseException(request.getEmailAddress());
+		}
+		User user = User.builder()
+				.emailAddress(request.getEmailAddress())
+				.firstName(request.getFirstName())
+				.lastName(request.getLastName())
+				.build();
 		return repository.save(user);
 	}
 	
 	public User update(User user) {
-		Optional<User> existingUserOp = repository.findByEmailAddress(user.getEmailAddress());
-		if(existingUserOp.isPresent() && (!Objects.equals(user.getId(), existingUserOp.get().getId()))) {
-			throw new EmailAddressInUseException(user.getEmailAddress());
-		}
 		User existingUser = repository.findById(user.getId())
-				.map(u -> map(user, u))
+				.map(u -> {
+					if (!u.getEmailAddress().equalsIgnoreCase(user.getEmailAddress())
+							&& repository.existsByEmailAddress(user.getEmailAddress())) {
+						log.error("Email address '{}' already in use", user.getEmailAddress());
+						throw new EmailAddressInUseException(user.getEmailAddress());
+					}
+					return u.toBuilder().emailAddress(user.getEmailAddress())
+							.firstName(user.getFirstName())
+							.lastName(user.getLastName())
+							.build();
+				})
 				.orElseThrow(() -> new UserNotFoundException(user.getId()));
 		return repository.save(existingUser);
 	}
@@ -58,10 +70,8 @@ public class UserService {
 	public Optional<User> getCurrentLead() {
 		return repository.findByLeadTrue();
 	}
-	
-	private User map(User from, User to) {
-		return to.emailAddress(from.getEmailAddress())
-				.firstName(from.getFirstName())
-				.lastName(from.getLastName());
+
+	public Optional<User> getOne(Long id) {
+		return repository.findById(id);
 	}
 }

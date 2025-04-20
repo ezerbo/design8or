@@ -6,7 +6,8 @@ import {
     DataGridBody,
     DataGridCell,
     DataGridHeader,
-    DataGridHeaderCell, DataGridProps,
+    DataGridHeaderCell,
+    DataGridProps,
     DataGridRow,
     Divider,
     makeStyles,
@@ -216,8 +217,7 @@ const columns: TableColumnDefinition<Item>[] = [
 
 export const Users: React.FunctionComponent = () => {
     const styles = useStyles();
-    const defaultSortState = React.useMemo<
-        Parameters<NonNullable<DataGridProps["onSortChange"]>>[1]
+    const defaultSortState = React.useMemo<Parameters<NonNullable<DataGridProps["onSortChange"]>>[1]
     >(() => ({ sortColumn: "file", sortDirection: "ascending" }), []);
     return (
         <div>
@@ -227,8 +227,7 @@ export const Users: React.FunctionComponent = () => {
                     items={items}
                     columns={columns}
                     defaultSortState={defaultSortState}
-                    style={{ minWidth: "500px" }}
-                >
+                    style={{ minWidth: "500px" }}>
                     <DataGridHeader>
                         <DataGridRow>
                             {({ renderHeaderCell }) => (

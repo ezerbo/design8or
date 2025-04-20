@@ -2,6 +2,7 @@ package com.ss.design8or.service.notification;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +17,14 @@ import com.ss.design8or.model.User;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 	
 	private final EmailNotificationService mailService;
+
 	private final PushNotificationService pushNotificationService;
+
 	private final WebSocketNotificationService webSocketNotificationService;
-	
-	public NotificationService(EmailNotificationService mailService,
-			PushNotificationService pushNotificationService, WebSocketNotificationService webSocketNotificationService) {
-		this.mailService = mailService;
-		this.pushNotificationService = pushNotificationService;
-		this.webSocketNotificationService = webSocketNotificationService;
-	}
 	
 	@Async
 	public void emitDesignationEvent(Designation designation) {

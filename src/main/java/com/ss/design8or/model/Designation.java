@@ -1,24 +1,9 @@
 package com.ss.design8or.model;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import java.util.Date;
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
+import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Designation {
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 	
@@ -61,12 +46,7 @@ public class Designation {
 	
 	@Column(name = "token")
 	private String token;
-	
-	public Designation status(DesignationStatus status) {
-		setStatus(status);
-		return this;
-	}
-	
+
 	public Designation accept() {
 		setStatus(DesignationStatus.ACCEPTED);
 		return this;
@@ -108,9 +88,7 @@ public class Designation {
 		setToken(null);
 		return this;
 	}
-	
-	
-	
+
 	@PrePersist
 	public void onSave() {
 		setDesignationDate(new Date());

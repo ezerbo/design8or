@@ -1,7 +1,7 @@
 .horizontalLayout {
     display: flex;
     justify-content: space-between; /* Adjusts space between items */
-    gap: 16px; /* Adds space between PoolStats and Users */
+    gap: 16px; /* Adds space between CurrentPool and Users */
     align-items: center; /* Aligns items vertically in the center */
 }
 

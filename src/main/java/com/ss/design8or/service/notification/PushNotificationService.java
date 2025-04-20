@@ -5,8 +5,9 @@ import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.time.LocalDateTime;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.lang.JoseException;
 import org.springframework.scheduling.annotation.Async;
@@ -32,23 +33,22 @@ import nl.martijndwars.webpush.PushService;
  */
 @Slf4j
 @Service
-class PushNotificationService {
-	
-	private final KeysConfig keys;
-	private PushService pushService;
+@RequiredArgsConstructor
+public class PushNotificationService {
+
+    private PushService pushService;
+
 	private final ObjectMapper objectMapper;
+
 	private final SubscriptionRepository subscriptionRepository;
-	
-	public PushNotificationService(ServiceProperties properties, ObjectMapper objectMapper,
-			SubscriptionRepository subscriptionRepository) {
-		this.keys = properties.getKeys();
-		this.objectMapper = objectMapper;
-		this.subscriptionRepository = subscriptionRepository;
-	}
+
+	private final ServiceProperties properties;
+
 	
 	@PostConstruct
 	public void init() throws GeneralSecurityException {
 		Security.addProvider(new BouncyCastleProvider());//TODO Go over java security providers
+        KeysConfig keys = properties.getKeys();
 		pushService = new PushService(keys.getPublicKey(), keys.getPrivateKey(), keys.getSubject());
 	}
 	
@@ -63,7 +63,7 @@ class PushNotificationService {
 		try {
 			pushService.sendAsync(notification);
 		} catch (GeneralSecurityException | IOException | JoseException e) {
-			e.printStackTrace();
+			log.error("Unable to send email", e);
 		}
 	}
 

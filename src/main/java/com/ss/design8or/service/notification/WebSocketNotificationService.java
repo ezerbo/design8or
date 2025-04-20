@@ -1,5 +1,6 @@
 package com.ss.design8or.service.notification;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,10 @@ import com.ss.design8or.model.Pool;
  *
  */
 @Service
-class WebSocketNotificationService {
+@RequiredArgsConstructor
+public class WebSocketNotificationService {
 	
-	private SimpMessagingTemplate messagingTemplate;
-	
-	public WebSocketNotificationService(SimpMessagingTemplate messagingTemplate) {
-		this.messagingTemplate = messagingTemplate;
-	}
+	private final SimpMessagingTemplate messagingTemplate;
 	
 	@Async
 	public void sendAssignmentEvent(Assignment assignment) {

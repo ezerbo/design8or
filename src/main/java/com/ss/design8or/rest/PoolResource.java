@@ -2,6 +2,9 @@ package com.ss.design8or.rest;
 
 import com.ss.design8or.model.*;
 import com.ss.design8or.repository.DesignationRepository;
+import com.ss.design8or.rest.response.GetPoolsResponse;
+import com.ss.design8or.rest.response.PoolDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/pools")
+@RequiredArgsConstructor
 public class PoolResource {
 	
 	private final PoolRepository repository;
@@ -27,41 +31,38 @@ public class PoolResource {
 
 	private final DesignationRepository designationRepository;
 	
-	public PoolResource(PoolRepository repository, UserRepository userRepository,
-						DesignationRepository designationRepository) {
-		this.repository = repository;
-		this.userRepository = userRepository;
-		this.designationRepository = designationRepository;
-	}
-	
 	@GetMapping
-	public ResponseEntity<Pools> pools() {
+	public ResponseEntity<GetPoolsResponse> pools() {
 		Pool currentPool = getCurrentPool();
-		long currentPoolAssignmentsCount = currentPool.getAssignments().size();
-		Pools pools = Pools.builder()
+		long assignmentsCount = currentPool.getAssignments().size();
+		GetPoolsResponse getPoolsResponse = GetPoolsResponse.builder()
 				.current(currentPool)
 				.past(repository.findPast(PageRequest.of(0, 2)).getContent())
-				.currentPoolProgress(calculateProgress(currentPoolAssignmentsCount))
-				.currentPoolParticipantsCount(currentPoolAssignmentsCount)
+				.progress(calculateProgress(assignmentsCount))
+				.participantsCount(assignmentsCount)
 				.build();
-		return ResponseEntity.ok(pools);
+		return ResponseEntity.ok(getPoolsResponse);
 	}
 
-	@GetMapping("/stats") //TODO Handle case where there's no lead for a newly created pool
-	public ResponseEntity<PoolStats> stats() {
-		Pool currentPool = getCurrentPool();
-		PoolStats stats = PoolStats.builder()
-				.count(repository.findAll().size())
-				.currentPool(PoolDTO.builder()
-						.id(currentPool.getId())
-						.startDate(currentPool.getStartDate())
-						.endDate(currentPool.getEndDate())
+	//TODO Handle case where there's no lead for a newly created pool
+	@GetMapping("/stats")
+	public ResponseEntity<CurrentPoolStats> stats() {
+		Pool pool = getCurrentPool();
+		long assignmentsCount = pool.getAssignments().size();
+		CurrentPoolStats stats = CurrentPoolStats.builder()
+				.count(repository.count())
+				.pool(PoolDTO.builder()
+						.id(pool.getId())
+						.progress(calculateProgress(assignmentsCount))
+						.participantsCount(assignmentsCount)
+						.startDate(pool.getStartDate())
+						.endDate(pool.getEndDate())
 						.lead(userRepository.findByLeadTrue()
-								.map(user -> UserDTO.builder() // TODO Add lead details
+								.map(user -> DesignationResource.UserDTO.builder()
 										.firstName(user.getFirstName())
 										.lastName(user.getLastName())
 										.emailAddress(user.getEmailAddress())
-										.build()))
+										.build()).orElse(null))
 						.build())
 				.build();
 		return ResponseEntity.ok(stats);
@@ -88,12 +89,12 @@ public class PoolResource {
 	
 	private Pool getCurrentPool() {
 		return repository.findCurrent()
-				.orElseGet(() -> repository.save(new Pool()));
+				.orElseGet(() -> repository.save(new Pool())); // Creates one if none exists
 	}
 	
-	private long calculateProgress(long currentPoolParticipantsCount) {
-		long totalNumberOfUsers = userRepository.count();
-		return totalNumberOfUsers == 0 ? 0 : (100 * currentPoolParticipantsCount) / totalNumberOfUsers;
+	private long calculateProgress(long participantsCount) {
+		long usersCount = userRepository.count();
+		return usersCount == 0 ? 0 : 100 * (participantsCount / usersCount);
 	}
 	
 }

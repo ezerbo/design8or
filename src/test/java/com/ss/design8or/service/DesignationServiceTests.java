@@ -1,54 +1,41 @@
 package com.ss.design8or.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.stream.Collectors;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import com.ss.design8or.error.DesignationNotFoundException;
-import com.ss.design8or.error.InvalidDesignationResponseException;
-import com.ss.design8or.error.UserNotFoundException;
-import com.ss.design8or.model.Assignment;
-import com.ss.design8or.model.AssignmentId;
-import com.ss.design8or.model.Designation;
-import com.ss.design8or.model.DesignationResponse;
-import com.ss.design8or.model.DesignationStatus;
-import com.ss.design8or.model.Pool;
-import com.ss.design8or.model.User;
+import com.ss.design8or.error.exception.DesignationNotFoundException;
+import com.ss.design8or.error.exception.InvalidDesignationResponseException;
+import com.ss.design8or.error.exception.UserNotFoundException;
+import com.ss.design8or.model.*;
 import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
+import com.ss.design8or.rest.response.DesignationResponse;
 import com.ss.design8or.service.notification.NotificationService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author ezerbo
  *
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-public class DesgnationServiceTests {
+public class DesignationServiceTests {
 
 	@Autowired
 	private PoolRepository poolRepository;
@@ -59,18 +46,16 @@ public class DesgnationServiceTests {
 	@Autowired
 	private AssignmentRepository assignmentRepository;
 
-	@MockBean
+	@MockitoBean
 	private NotificationService notificationService;
 
 	@Autowired
 	private DesignationRepository designationRepository;
 
 	private DesignationService service;
-	
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
+
+	@BeforeEach
 	public void init() {
 		AssignmentService assignmentService = new AssignmentService(userRepository, assignmentRepository);
 		service = new DesignationService(poolRepository, userRepository,
@@ -85,9 +70,9 @@ public class DesgnationServiceTests {
 		assertThat(designated).isEqualTo(designatedFromDB);
 	}
 	
-	@Test(expected = UserNotFoundException.class)
+	@Test
 	public void designateThrowsUserNotFoundException() {
-		service.designate(User.builder().id(0L).build());
+		assertThrows(UserNotFoundException.class, () -> service.designate(User.builder().id(0L).build()));
 	}
 	
 	@Test
@@ -99,44 +84,46 @@ public class DesgnationServiceTests {
 		assertThat(oldPendingDesignation.getStatus()).isEqualByComparingTo(DesignationStatus.REASSIGNED);
 		assertFalse(oldPendingDesignation.isPending());
 		assertThat(newPendingDesignation.getStatus()).isEqualByComparingTo(DesignationStatus.PENDING);
-		assertThat(newPendingDesignation.isPending());
+		assertTrue(newPendingDesignation.isPending());
 		assertThat(user).isSameAs(newPendingDesignation.getUser());
 		verify(notificationService, times(1)).emitDesignationEvent(newPendingDesignation);
 	}
 	
-	@Test(expected = InvalidDesignationResponseException.class)
+	@Test
 	public void processDesignationResponseThrowsInvalidResponse() {
-		service.processDesignationResponse(DesignationResponse.builder().response("unknow").build());
+		assertThrows(InvalidDesignationResponseException.class,
+				() -> service.processDesignationResponse(DesignationResponse.builder().response("unknow").build()));
 	}
 	
 	@Test
 	public void processDesignationResponseThrowsUserNotFoundException() {
-		expectedException.expect(UserNotFoundException.class);
-		expectedException.expectMessage("No user found with email address: 'test@test.com'");
 		DesignationResponse response = DesignationResponse.builder()
 				.response("accept")
 				.emailAddress("test@test.com")
 				.token("2cSMV4FoSBwSHTOxG6uIilAOlmpbhEG0")
 				.build();
-		service.processDesignationResponse(response);
+		UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+				() -> service.processDesignationResponse(response));
+		assertThat(exception.getMessage()).isEqualTo("No user found with email address: 'test@test.com'");
 	}
 	
 	@Test
 	public void processDesignationResponseThrowsDesignationNotFoundException() {
-		expectedException.expect(DesignationNotFoundException.class);
-		expectedException.expectMessage("No designation Found. It may have already been accepted.");
 		DesignationResponse response = DesignationResponse.builder()
 				.response("accept")
 				.emailAddress("sandji.vinsmoke@onpiece.com")
 				.token("2cSMV4FoSBwSHTOxG6uIilAOlmpbhEG0TzIAUGBskX+Z3zbnbFmwYw==")
 				.build();
-		service.processDesignationResponse(response);
+		DesignationNotFoundException exception = assertThrows(DesignationNotFoundException.class,
+				() -> service.processDesignationResponse(response));
+		assertThat(exception.getMessage())
+				.isEqualTo("No designation Found. It may have already been accepted.");
 	}
 	
 	@Test
 	public void processDesignationResponseCreatesAssignment() {
 		assertThat(designationRepository.findCurrent().get().getUser().getEmailAddress()).isEqualTo("chopper.tonytony@onepiece.com");
-		assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1l).poolId(3l).build())).isNotPresent();
+		assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(3L).build())).isNotPresent();
 		DesignationResponse response = DesignationResponse.builder()
 				.response("accept")
 				.emailAddress("chopper.tonytony@onepiece.com")
@@ -146,7 +133,7 @@ public class DesgnationServiceTests {
 		assertThat(designation.getUser().getEmailAddress()).isEqualTo("chopper.tonytony@onepiece.com");
 		verify(notificationService, times(1)).emitAssignmentEvent(any(Assignment.class));
 		assertThat(designationRepository.findCurrent()).isNotPresent();
-		assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1l).poolId(3l).build())).isPresent();
+		assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(3L).build())).isPresent();
 		assertThat(designation.getStatus()).isEqualByComparingTo(DesignationStatus.ACCEPTED);
 	}
 	
@@ -196,7 +183,7 @@ public class DesgnationServiceTests {
 	public void designateCreatesNewPoolOnMissingCurrentPool() {
 		System.out.println("Tests : " + userRepository.count());
 		userRepository.findAll().stream().filter(u -> !u.isLead())
-			.map(u -> assignmentRepository.save(createAssignment(u))).collect(Collectors.toList()); // <--- Create assignment for all users (lead already has an assignment)
+			.map(u -> assignmentRepository.save(createAssignment(u))).toList(); // <--- Create assignment for all users (lead already has an assignment)
 		Pool oldPool = poolRepository.findCurrent().get();
 		service.designate();
 		assertThat(poolRepository.findCurrent().get()).isNotSameAs(oldPool);

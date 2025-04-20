@@ -1,5 +1,6 @@
 package com.ss.design8or.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.ss.design8or.model.Assignment;
@@ -14,18 +15,15 @@ import com.ss.design8or.repository.UserRepository;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class AssignmentService {
 
-	private UserRepository userRepository;
-	private AssignmentRepository repository;
-	
-	public AssignmentService(UserRepository userRepository, AssignmentRepository repository) {
-		this.repository = repository;
-		this.userRepository = userRepository;
-	}
+	private final UserRepository userRepository;
+
+	private final AssignmentRepository repository;
 	
 	public Assignment create(User user, Pool pool) {
-		userRepository.findByLeadTrue().map(u -> userRepository.save(u.unelect()));
+		userRepository.findByLeadTrue().map(u -> userRepository.save(u.unElect()));
 		userRepository.save(user.elect());
 		AssignmentId assignmentId = AssignmentId.builder()
 				.poolId(pool.getId()).userId(user.getId()).build();

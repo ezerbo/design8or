@@ -1,22 +1,13 @@
 package com.ss.design8or.model;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +21,7 @@ import lombok.ToString;
  */
 @Data
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"assignments", "designations"})
@@ -38,11 +29,9 @@ import lombok.ToString;
 @Table(name = "user", catalog = "design8or_db",
 uniqueConstraints = { @UniqueConstraint(columnNames = "email_address") })
 public class User implements Serializable {
-	
-	private static final long serialVersionUID = 7758127706202666953L;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 	
@@ -68,28 +57,13 @@ public class User implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Designation> designations;
-	
-	public User emailAddress(String emailAddress) {
-		setEmailAddress(emailAddress);
-		return this;
-	}
-	
-	public User firstName(String firstName) {
-		setFirstName(firstName);
-		return this;
-	}
-	
-	public User lastName(String lastName) {
-		setLastName(lastName);
-		return this;
-	}
-	
+
 	public User elect() {
 		setLead(true);
 		return this;
 	}
 	
-	public User unelect() {
+	public User unElect() {
 		setLead(false);
 		return this;
 	}
