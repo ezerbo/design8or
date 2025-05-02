@@ -1,4 +1,4 @@
-package com.ss.design8or.config;
+package com.ss.design8or.config.properties;
 
 import lombok.Data;
 

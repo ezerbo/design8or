@@ -19,15 +19,15 @@
                     Howdy <label th:text="|${user.firstName} ${user.lastName}|">Edouard ZERBO</label>, you have been selected to be the lead.
                 </p>
             </div>
-            <a th:href="@{|${reponseUrl}&response=accept|}" class="btn btn-success">
+            <a th:href="@{|${reponseUrl}?answer=ACCEPT|}" class="btn btn-success">
                     <i class="fas fa-thumbs-up"></i> Count on me!
                 </a>
-            <a th:href="@{|${reponseUrl}&response=decline|}" class="btn btn-danger">
+            <a th:href="@{|${reponseUrl}?answer=DECLINE|}" class="btn btn-danger">
                 <i class="fas fa-thumbs-down"></i> Sorry, not today
             </a>
         </div>
         <div class="card-footer text-left">
-            <p> &copy; MSL <label th:text="${year}">2019</label></p>
+            <p> &copy; SimpleSoft <label>[[${#dates.format(#dates.createNow(), 'yyyy')}]]</label></p>
         </div>
     </div>
 </body>

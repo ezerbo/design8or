@@ -1,18 +1,15 @@
 package com.ss.design8or.rest;
 
+import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.DesignationStatus;
+import com.ss.design8or.repository.DesignationRepository;
+import com.ss.design8or.rest.request.DesignationRequest;
+import com.ss.design8or.rest.response.DesignationAnswer;
+import com.ss.design8or.rest.response.DesignationResponse;
+import com.ss.design8or.service.DesignationService;
 import lombok.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.ss.design8or.model.Designation;
-import com.ss.design8or.rest.response.DesignationResponse;
-import com.ss.design8or.model.User;
-import com.ss.design8or.repository.DesignationRepository;
-import com.ss.design8or.service.DesignationService;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author ezerbo
@@ -27,20 +24,20 @@ public class DesignationResource {
 
 	private final DesignationRepository repository;
 
-	@PostMapping
-	public ResponseEntity<?> assignManually(@RequestBody User user) {
-		return ResponseEntity.ok(service.designate(user));
+	@PostMapping("/current/reassign")
+	public ResponseEntity<DesignationResponse> reassign(@RequestBody DesignationRequest request) {
+		return ResponseEntity.ok(service.designate(request.getUserId()));
 	}
 	
-	@PostMapping("/response") //TODO use /designations/{id}/response
-	public ResponseEntity<Designation> processDesignationResponse(@RequestBody DesignationResponse response) {
-		Designation designation = service.processDesignationResponse(response);
-		return ResponseEntity.ok(designation);
+	@GetMapping("/{id}/response")
+	public ResponseEntity<DesignationResponse> processResponse(@PathVariable long id,
+															   @RequestParam DesignationAnswer answer) {
+		return ResponseEntity.ok(service.processResponse(id, answer));
 	}
 	
 	@GetMapping( "/current")
 	public ResponseEntity<Designation> findCurrent() {
-		return repository.findCurrent()
+		return repository.findOneByStatus(DesignationStatus.PENDING)
 					.map(ResponseEntity::ok)
 					.orElse(ResponseEntity.notFound().build());
 	}

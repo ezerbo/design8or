@@ -1,6 +1,8 @@
 package com.ss.design8or.service.notification;
 import java.time.LocalDate;
+import java.util.Map;
 
+import com.ss.design8or.model.DesignationStatus;
 import jakarta.mail.internet.MimeMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -9,11 +11,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.Context;
 
-import com.ss.design8or.config.ServiceProperties;
+import com.ss.design8or.config.properties.ServiceProperties;
 import com.ss.design8or.model.Designation;
-import com.ss.design8or.model.MailConfig;
 import com.ss.design8or.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +34,14 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailNotificationService {
+public class EmailService {
 
     private static final String USER = "user";
-    private static final String DECLINED_DESIGNATION_USER = "declinedDesignationUser";
-    private static final String DESIGNATION_RESPONSE_URL = "reponseUrl";
+
+    private static final String LEAD = "lead";
+
+    private static final String RESPONSE_URL = "reponseUrl";
+
     private static final String YEAR = "year";
     
     private final ServiceProperties properties;
@@ -47,14 +52,14 @@ public class EmailNotificationService {
 
     
     @Async
-    void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+    void sendEmail(String to, String subject, String content) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, false, CharEncoding.UTF_8);
             message.setTo(to);
             message.setFrom(properties.getMail().getFrom());
             message.setSubject(subject);
-            message.setText(content, isHtml);
+            message.setText(content, true);
             javaMailSender.send(mimeMessage);
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
@@ -71,24 +76,24 @@ public class EmailNotificationService {
     public void sendDesignationEvent(Designation designation, User candidate) {
         Context context = new Context();
         context.setVariable(USER, candidate);
-        String responseUrl = computeDesignationResponseUrl(designation.getToken(), candidate.getEmailAddress());
-		context.setVariable(DESIGNATION_RESPONSE_URL, responseUrl);
+		context.setVariable(RESPONSE_URL, getResponseUrl(designation.getId()));
         context.setVariable(YEAR, LocalDate.now().getYear());
         String content;
-        if(designation.isDeclined()) {
-        	context.setVariable(DECLINED_DESIGNATION_USER, designation.getUser());
+        if(DesignationStatus.DECLINED.equals(designation.getStatus())) {
+        	context.setVariable(LEAD, designation.getUser());
         	content = templateEngine.process("designation-broadcast", context);
         } else {
         	content = templateEngine.process("designation", context);
         }
         String subject = properties.getMail().getDesignationEmailSubject();
-        sendEmail(candidate.getEmailAddress(), subject, content, false, true);
+        sendEmail(candidate.getEmailAddress(), subject, content);
     }
     
-    private String computeDesignationResponseUrl(String token, String emailAddress) {
-    	MailConfig mailConfig = properties.getMail();
-    	String responseBaseUrl = mailConfig.getDesignationResponseBaseUrl();
-    	return String.format("%s/designations/response?token=%s&email=%s", responseBaseUrl, token, emailAddress);
+    private String getResponseUrl(long designationId) {
+        return UriComponentsBuilder.fromUriString(properties.getMail().getDesignationResponseBaseUrl())
+                .path("/designations/{id}/response")
+                .buildAndExpand(Map.of("id", designationId))
+                .toUriString();
     }
     
 }

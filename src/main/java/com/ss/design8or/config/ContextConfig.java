@@ -2,9 +2,9 @@ package com.ss.design8or.config;
 
 import java.util.concurrent.Executor;
 
+import com.ss.design8or.config.properties.ServiceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,11 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import com.ss.design8or.service.DesignationService;
-import com.ss.design8or.service.ParameterService;
-import com.ss.design8or.service.job.StaleRequestHandlerTask;
-import com.ss.design8or.service.job.StaleRequestHandler;
 
 /**
  * @author ezerbo
@@ -37,14 +32,6 @@ public class ContextConfig {
 						.anyRequest().permitAll())
 				.cors(Customizer.withDefaults()).csrf().disable();
 		return http.build();
-	}
-	
-	@Bean
-	@Scope("")// "" Defaults to singleton 
-	public StaleRequestHandler staleRequestHandler(DesignationService designationService,
-												   StaleRequestHandlerTask handlerTask,
-												   ParameterService parameterService) {
-		return new StaleRequestHandler(handlerTask, parameterService, designationService);
 	}
 	
 	@Bean

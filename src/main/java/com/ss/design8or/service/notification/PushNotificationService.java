@@ -15,10 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ss.design8or.config.ServiceProperties;
-import com.ss.design8or.model.KeysConfig;
-import com.ss.design8or.model.NotificationData;
-import com.ss.design8or.model.NotificationPayload;
+import com.ss.design8or.config.properties.ServiceProperties;
+import com.ss.design8or.config.properties.KeysProperties;
 import com.ss.design8or.model.Subscription;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.SubscriptionRepository;
@@ -48,7 +46,7 @@ public class PushNotificationService {
 	@PostConstruct
 	public void init() throws GeneralSecurityException {
 		Security.addProvider(new BouncyCastleProvider());//TODO Go over java security providers
-        KeysConfig keys = properties.getKeys();
+        KeysProperties keys = properties.getKeys();
 		pushService = new PushService(keys.getPublicKey(), keys.getPrivateKey(), keys.getSubject());
 	}
 	
@@ -86,8 +84,8 @@ public class PushNotificationService {
 		}
 	}
 	
-	private com.ss.design8or.model.Notification buildNotification(String emailAddress) {
-		return com.ss.design8or.model.Notification.builder()
+	private com.ss.design8or.service.notification.Notification buildNotification(String emailAddress) {
+		return com.ss.design8or.service.notification.Notification.builder()
 				.title("Design8or")
 				.body(String.format("%s is the new lead", emailAddress))
 				.data(getNotificationData())

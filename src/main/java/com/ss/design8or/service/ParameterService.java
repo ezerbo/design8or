@@ -30,7 +30,7 @@ public class ParameterService {
 	
 	public Parameter save(Parameter parameter) {
 		parameter.setId(1L);
-		rotationService.rescheduleRotation(parameter.getRotationTime());
+		rotationService.reschedule(parameter.getRotationTime());
 		notificationService.emitParametersUpdateEvent(parameter);
 		return repository.save(parameter);
 	}

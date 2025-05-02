@@ -1,6 +1,6 @@
 package com.ss.design8or;
 
-import com.ss.design8or.config.ServiceProperties;
+import com.ss.design8or.config.properties.ServiceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

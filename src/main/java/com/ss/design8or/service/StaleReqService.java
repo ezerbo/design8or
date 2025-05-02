@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author ezerbo
@@ -16,9 +14,7 @@ import java.util.TimerTask;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class StaleRequestHandler {
-
-    public static final String TIMER_NAME = "StaleReqTimer";
+public class StaleReqService {
 
     private static final int MILLISECONDS_PER_MINUTE = 60000;
 
@@ -35,8 +31,9 @@ public class StaleRequestHandler {
      */
     public void startTimer() {
         long period = parameterService.getParameter().getStaleReqCheckPeriodInMins() * MILLISECONDS_PER_MINUTE;
-        new Timer(TIMER_NAME).schedule(new StaleReqTimerTask(designationRepository, notificationService, period), TIMER_DELAY, period);
+        Timer staleReqTimer = new Timer("StaleReqTimer");
+        staleReqTimer.schedule(new StaleReqTimerTask(designationRepository, notificationService, period),
+                TIMER_DELAY, period);
     }
-
 
 }

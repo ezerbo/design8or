@@ -15,13 +15,13 @@ public class MessagingConfiguration implements WebSocketMessageBrokerConfigurer 
 	
 	@Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes(Constants.WS_BROKER_DESTINATION_PREFIX)
-        	.enableSimpleBroker(Constants.DESIGNATIONS_CHANNEL, Constants.PARAMETERS_CHANNEL, 
-        			Constants.POOLS_CHANNEL, Constants.ASSIGNMENTS_CHANNEL);
+        registry.setApplicationDestinationPrefixes(WebSocketEndpoints.WS_BROKER_DESTINATION_PREFIX)
+        	.enableSimpleBroker(WebSocketEndpoints.DESIGNATIONS_CHANNEL, WebSocketEndpoints.PARAMETERS_CHANNEL,
+        			WebSocketEndpoints.POOLS_CHANNEL, WebSocketEndpoints.ASSIGNMENTS_CHANNEL);
     }
 	
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(Constants.WS_ENDPOINT)
+        registry.addEndpoint(WebSocketEndpoints.WS_ENDPOINT)
         .setAllowedOrigins("*")
         .withSockJS();
     }

@@ -2,6 +2,7 @@ package com.ss.design8or.service;
 
 import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.Pool;
+import com.ss.design8or.model.PoolStatus;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.PoolRepository;
@@ -45,7 +46,7 @@ public class AssignmentServiceTests {
 	public void createAssignmentSetsUserAsLead() {
 		User oldLead = userRepository.findByLeadTrue().get();
 		User user = userRepository.findById(3L).get();
-		Pool currentPool = poolRepository.findCurrent().get();
+		Pool currentPool = poolRepository.findOneByStatus(PoolStatus.STARTED).get();
 		Assignment assignment = service.create(user, currentPool);
 		User newLead = userRepository.findByLeadTrue().get();
 		assertThat(newLead).isNotSameAs(oldLead);

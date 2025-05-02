@@ -4,7 +4,7 @@ package com.ss.design8or.config;
  * @author ezerbo
  *
  */
-public class Constants {
+public class WebSocketEndpoints {
 
 	public static final String WS_BROKER_DESTINATION_PREFIX = "/design8or";
 

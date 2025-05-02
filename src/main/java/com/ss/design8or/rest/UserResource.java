@@ -26,7 +26,7 @@ public class UserResource {
 
 	@GetMapping
 	public ResponseEntity<List<User>> getAll() {
-		return ResponseEntity.ok(service.getAll());
+		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@PostMapping

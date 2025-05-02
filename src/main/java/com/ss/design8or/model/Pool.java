@@ -20,7 +20,7 @@ import lombok.ToString;
  */
 @Data
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"assignments"})
@@ -40,22 +40,19 @@ public class Pool {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "end_date")
 	private Date endDate;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
+	private PoolStatus status;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "pool", orphanRemoval = true)
+	@OneToMany(mappedBy = "pool", orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Assignment> assignments;
 	
 	@PrePersist
 	public void onCreate() {
-		setStartDate(new Date());
-	}
-	
-	public Pool end() {
-		setEndDate(new Date());
-		return this;
+		startDate = new Date();
+		status = PoolStatus.STARTED;
 	}
 
-	public boolean isClosed() {
-		return endDate != null;
-	}
 }

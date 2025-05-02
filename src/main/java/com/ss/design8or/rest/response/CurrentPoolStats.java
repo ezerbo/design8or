@@ -1,6 +1,5 @@
-package com.ss.design8or.model;
+package com.ss.design8or.rest.response;
 
-import com.ss.design8or.rest.response.PoolDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

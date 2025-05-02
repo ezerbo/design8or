@@ -33,6 +33,6 @@ public class Parameter {
 	@Column(name = "rotation_time", nullable = false)
 	private LocalTime rotationTime;
 	
-	@Column(name = "st_req_timer_delay", nullable = false)
-	private Long staleRequestTimeDelay;
+	@Column(name = "st_req_check_period_mins", nullable = false)
+	private Long staleReqCheckPeriodInMins;
 }

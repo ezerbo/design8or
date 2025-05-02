@@ -1,10 +1,7 @@
-package com.ss.design8or.config;
+package com.ss.design8or.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.cors.CorsConfiguration;
-
-import com.ss.design8or.model.KeysConfig;
-import com.ss.design8or.model.MailConfig;
 
 import lombok.Data;
 
@@ -16,9 +13,9 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "app")
 public class ServiceProperties {
 	
-	private MailConfig mail = new MailConfig();
+	private MailProperties mail = new MailProperties();
 	
-	private KeysConfig keys = new KeysConfig();
+	private KeysProperties keys = new KeysProperties();
 
 	private RotationProperties rotation = new RotationProperties();
 	

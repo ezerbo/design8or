@@ -1,15 +1,13 @@
 package com.ss.design8or.model;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  * @author ezerbo
@@ -20,9 +18,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignmentId implements Serializable {
-	
-	private static final long serialVersionUID = -2124715621667674123L;
+public class AssignmentId {
 	
 	@Column(name = "user_id", nullable = false)
 	private Long userId;
@@ -33,9 +29,8 @@ public class AssignmentId implements Serializable {
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) return true;
-		if (!(other instanceof AssignmentId)) return false;
-		AssignmentId castOther = (AssignmentId)other;
-		return (Objects.equals(this.poolId, castOther.poolId)) && (Objects.equals(this.userId, castOther.userId));
+		if (!(other instanceof AssignmentId castOther)) return false;
+        return (Objects.equals(this.poolId, castOther.poolId)) && (Objects.equals(this.userId, castOther.userId));
 	}
 	
 	@Override

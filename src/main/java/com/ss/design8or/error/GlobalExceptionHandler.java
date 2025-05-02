@@ -1,6 +1,7 @@
 package com.ss.design8or.error;
 
 import com.ss.design8or.error.exception.EmailAddressInUseException;
+import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.error.exception.SubscriptionException;
 import com.ss.design8or.error.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,13 @@ public class GlobalExceptionHandler {
 						.description("Unable to process request")
 						.message(e.getMessage())
 						.build(), HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler({ ResourceNotFoundException.class })
+	public ResponseEntity<ErrorVM> notFound(ResourceNotFoundException e) {
+		return new ResponseEntity<>(ErrorVM.builder()
+				.description("Unable to process request due to missing resource")
+				.message(e.getMessage())
+				.build(), HttpStatus.NOT_FOUND);
 	}
 }

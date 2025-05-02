@@ -59,12 +59,8 @@ public class UserService {
 		repository.delete(user);
 	}
 	
-	public List<User> getAll() {
+	public List<User> findAll() {
 		return repository.findAll();
-	}
-	
-	public List<User> getCurrentPoolCandidates() {
-		return repository.getCurrentPoolCandidates();
 	}
 	
 	public Optional<User> getCurrentLead() {
@@ -73,5 +69,14 @@ public class UserService {
 
 	public Optional<User> getOne(Long id) {
 		return repository.findById(id);
+	}
+
+	public User findById(Long id) {
+		return repository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException(id));
+	}
+
+	public long count() {
+		return repository.count();
 	}
 }

@@ -1,11 +1,10 @@
 package com.ss.design8or.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.DesignationStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 /**
  * @author ezerbo
@@ -13,9 +12,6 @@ import com.ss.design8or.model.Designation;
  */
 public interface DesignationRepository extends JpaRepository<Designation, Long> {
 
-	@Query("from Designation d where d.token is not null")
-	Optional<Designation> findCurrent();
-	
-	@Query("from Designation d where d.token is not null and (d.status='DECLINED' or d.status='STALED')")
-	Designation findStaleOrDeclined();
+	Optional<Designation> findOneByStatus(DesignationStatus status);
+
 }

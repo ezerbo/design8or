@@ -1,4 +1,4 @@
-package com.ss.design8or.model;
+package com.ss.design8or.config.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KeysConfig {
+public class KeysProperties {
 
 	private String publicKey;
 

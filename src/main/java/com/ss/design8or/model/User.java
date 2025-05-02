@@ -1,19 +1,12 @@
 package com.ss.design8or.model;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.List;
 
 /**
  * @author ezerbo
@@ -26,9 +19,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(exclude = {"assignments", "designations"})
 @EqualsAndHashCode(exclude = {"assignments", "designations"})
-@Table(name = "user", catalog = "design8or_db",
-uniqueConstraints = { @UniqueConstraint(columnNames = "email_address") })
-public class User implements Serializable {
+@Table(name = "user", catalog = "design8or_db")
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

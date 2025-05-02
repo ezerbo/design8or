@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: Design8or
   security:
     user:
       name: design8tor
@@ -44,4 +46,6 @@ app:
   mail: 
     from: zerboedouard@gmail.com
     designation-email-subject: You have been selected to be the lead
-    designation-response-base-url: http://localhost:4200
+    designation-response-base-url: http://localhost:8080
+  rotation:
+    cron-expression: 0 %s %s ? * * *
