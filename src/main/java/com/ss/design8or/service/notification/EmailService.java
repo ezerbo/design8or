@@ -88,7 +88,7 @@ public class EmailNotificationService {
     private String computeDesignationResponseUrl(String token, String emailAddress) {
     	MailConfig mailConfig = properties.getMail();
     	String responseBaseUrl = mailConfig.getDesignationResponseBaseUrl();
-    	return String.format("%s/designation-response?token=%s&email=%s", responseBaseUrl, token, emailAddress);
+    	return String.format("%s/designations/response?token=%s&email=%s", responseBaseUrl, token, emailAddress);
     }
     
 }

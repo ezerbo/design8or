@@ -25,7 +25,9 @@ export const CurrentPool: React.FunctionComponent = () => {
 
     useEffect(() => {
         httpGet<CurrentPoolStats>(POOL_STATS_URL)
-            .then((stats) => { setStats(stats); });
+            .then((stats) => {
+                setStats(stats);
+            });
 
         httpGet<Designation>(CURRENT_DESIGNATIONS_URL)
             .then(designation => setDesignation(designation));
@@ -51,25 +53,24 @@ export const CurrentPool: React.FunctionComponent = () => {
                 <Divider/>
                 Designation Countdown: ...
             </Card>
+            {
+                designation && (
+                    <Card className={styles.card}>
+                        <Tooltip content="Designated" relationship="label">
+                            <SlideTextPerson32Regular/>
+                        </Tooltip>
+                        <Divider/>
 
-            <Card className={styles.card}>
-                <Tooltip content="Designated" relationship="label">
-                    <SlideTextPerson32Regular/>
-                </Tooltip>
-                <Divider/>
-                {
-                    designation ? (
                         <ul>
                             <li className={style.listItem}>Firstname: {designation.user?.firstName}</li>
                             <li>Lastname: {designation.user?.lastName}</li>
                             <li>Email Address: {designation.user?.emailAddress}</li>
                         </ul>
-                    ) : (<Spinner size="small"/>)
-                }
-                <Divider/>
-                {designation && <span>Status: {designation.status}</span>}
-            </Card>
-
+                        <Divider/>
+                        {designation && <span>Status: {designation.status}</span>}
+                    </Card>
+                )
+            }
             <Card className={styles.card}>
                 <Tooltip content="Pools" relationship="label">
                     <PeopleAudience32Regular/>

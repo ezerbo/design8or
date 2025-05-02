@@ -19,6 +19,8 @@ public class ServiceProperties {
 	private MailConfig mail = new MailConfig();
 	
 	private KeysConfig keys = new KeysConfig();
+
+	private RotationProperties rotation = new RotationProperties();
 	
 	private CorsConfiguration cors = new CorsConfiguration();
 }
