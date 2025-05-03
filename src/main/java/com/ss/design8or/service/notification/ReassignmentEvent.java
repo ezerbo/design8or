@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Assignments {
+public class ReassignmentEvent {
 
     private Assignment assignment;
 

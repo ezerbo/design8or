@@ -18,13 +18,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class DesignationResponse {
 	
-	private long designationId;
+	private long id;
 
 	private Date designationDate;
 
 	private DesignationStatus status;
-
-	private DesignationStatus previousStatus;
 
 	private String emailAddress;
 

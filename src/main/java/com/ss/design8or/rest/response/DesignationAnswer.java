@@ -5,14 +5,7 @@ import lombok.Getter;
 @Getter
 public enum DesignationAnswer {
 
-    ACCEPT("accept"),
+    ACCEPT,
 
-    DECLINE("decline");
-
-    private final String answer;
-
-    DesignationAnswer(String answer) {
-        this.answer = answer;
-    }
-
+    DECLINE
 }

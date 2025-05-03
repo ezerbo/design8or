@@ -34,18 +34,28 @@ spring:
     init:
       data-locations: classpath:data/data.sql
 
+springdoc:
+  api-docs:
+    path: /api-docs
+    version: OPENAPI_3_1
+  swagger-ui:
+    path: /swagger-ui.html
 
 app:
+
   cors:
     allowed-origins:
     - http://localhost:4200
-  keys: 
+
+  keys:
     subject: zerboedouard@gmail.com
     public-key: BF_aZ-cmliVi5qbtxhGZrxxGZtEys0aLjZLhmtrboGtGiV__OxZa_emH2spKWNx8lZni_11a4oUJCfuEdT8x5rg
     private-key: PyHDwHGKXXt5Ge9phcghR0TMo53ABZCIn2PpjcbWiuQ
-  mail: 
-    from: zerboedouard@gmail.com
-    designation-email-subject: You have been selected to be the lead
-    designation-response-base-url: http://localhost:8080
+
   rotation:
     cron-expression: 0 %s %s ? * * *
+
+  designation-email:
+    from: zerboedouard@gmail.com
+    subject: You have been selected to be the lead
+    response-base-url: http://localhost:8080

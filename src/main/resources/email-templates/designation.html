@@ -15,14 +15,22 @@
             <p class="font-weight-bold">Design8or</p>
             <hr>
             <div class="m-3">
-                <p class="card-text">
+                <p class="card-text" th:if="${!isDeclined}">
                     Howdy <label th:text="|${user.firstName} ${user.lastName}|">Edouard ZERBO</label>, you have been selected to be the lead.
                 </p>
+
+                <p class="card-text" th:if="${isDeclined}">
+                    Howdy <label th:text="|${user.firstName} ${user.lastName}|">Edouard ZERBO</label>,
+                    <label th:text="|${lead.firstName} ${lead.lastName}|">Jane Doe</label> has declined a designation request. <br>
+                    Do you mind being the lead today ?
+                </p>
+
             </div>
-            <a th:href="@{|${reponseUrl}?answer=ACCEPT|}" class="btn btn-success">
+
+            <a th:href="@{|${responseUrl}&answer=ACCEPT|}" class="btn btn-success">
                     <i class="fas fa-thumbs-up"></i> Count on me!
                 </a>
-            <a th:href="@{|${reponseUrl}?answer=DECLINE|}" class="btn btn-danger">
+            <a th:href="@{|${responseUrl}&answer=DECLINE|}" class="btn btn-danger">
                 <i class="fas fa-thumbs-down"></i> Sorry, not today
             </a>
         </div>

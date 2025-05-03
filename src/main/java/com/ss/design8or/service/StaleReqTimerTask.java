@@ -2,7 +2,7 @@ package com.ss.design8or.service;
 
 import com.ss.design8or.model.DesignationStatus;
 import com.ss.design8or.repository.DesignationRepository;
-import com.ss.design8or.service.notification.NotificationService;
+import com.ss.design8or.service.notification.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +15,9 @@ public class StaleReqTimerTask extends TimerTask {
 
     private final DesignationRepository designationRepository;
 
-    private final NotificationService notificationService;
+    private final EmailService emailService;
+
+    private final PoolService poolService;
 
     private final long checkInterval;
 
@@ -26,7 +28,9 @@ public class StaleReqTimerTask extends TimerTask {
                 long elapsedTime = new Date().getTime() - designation.getDesignationDate().getTime();
                 if (elapsedTime >= checkInterval) {
                     log.info("Stale designation request found, sending notifications to all candidates...");
-                    notificationService.broadcastDesignationEvents(designation);
+                    designation.setStatus(DesignationStatus.STALE);
+                    designationRepository.save(designation);
+                    emailService.broadcastDeclinationEmail(designation, poolService.getCurrentPoolCandidates());
                 }
             }); 
         }

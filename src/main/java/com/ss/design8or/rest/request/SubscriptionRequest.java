@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateSubscriptionRequest {
+public class SubscriptionRequest {
 
 	private String endpoint;
 

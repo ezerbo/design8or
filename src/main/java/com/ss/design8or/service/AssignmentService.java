@@ -23,13 +23,17 @@ public class AssignmentService {
 	private final AssignmentRepository repository;
 	
 	public Assignment create(User user, Pool pool) {
-		userRepository.findByLeadTrue().map(u -> userRepository.save(u.unElect()));
-		userRepository.save(user.elect());
+		userRepository.findByLeadTrue().ifPresent(currentLead ->{
+			currentLead.setLead(false);
+			userRepository.save(currentLead);
+		});
+		user.setLead(true);
+		userRepository.save(user);
 		AssignmentId assignmentId = AssignmentId.builder()
 				.poolId(pool.getId()).userId(user.getId()).build();
 		Assignment assignment = Assignment.builder()
 				.id(assignmentId).user(user).pool(pool).build();
 		return repository.save(assignment);
 	}
-	
+
 }

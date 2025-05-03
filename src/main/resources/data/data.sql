@@ -8,7 +8,7 @@ insert into design8or_db.pool(id, start_date, end_date, status) values (1, curre
 insert into design8or_db.pool(id, start_date, end_date, status) values (2, current_timestamp() - 10, current_timestamp() - 1, 'ENDED');
 insert into design8or_db.pool(id, start_date, end_date, status) values (3, current_timestamp() - 1 , null, 'STARTED'); --Current Pool
 
-insert into design8or_db.assignment(user_id, pool_id, assignment_date) values (2, 3, current_timestamp());
+--insert into design8or_db.assignment(user_id, pool_id, assignment_date) values (1, 3, current_timestamp());
 
 insert into design8or_db.designation(id, user_id, status, designation_date, user_response_date) values (1, 1, 'PENDING', current_timestamp(), null);
 insert into design8or_db.designation(id, user_id, status, designation_date, user_response_date) values (2, 1, 'ACCEPTED', current_timestamp() - 30, current_timestamp());

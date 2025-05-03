@@ -50,13 +50,4 @@ public class User {
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Designation> designations;
 
-	public User elect() {
-		setLead(true);
-		return this;
-	}
-	
-	public User unElect() {
-		setLead(false);
-		return this;
-	}
 }

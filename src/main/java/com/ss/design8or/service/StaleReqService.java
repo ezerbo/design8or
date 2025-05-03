@@ -1,7 +1,7 @@
 package com.ss.design8or.service;
 
 import com.ss.design8or.repository.DesignationRepository;
-import com.ss.design8or.service.notification.NotificationService;
+import com.ss.design8or.service.notification.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,9 @@ public class StaleReqService {
 
     private final DesignationRepository designationRepository;
 
-    private final NotificationService notificationService;
+    private final PoolService poolService;
+
+    private final EmailService emailService;
 
     /**
      * Start a timer to check for stale requests
@@ -32,7 +34,7 @@ public class StaleReqService {
     public void startTimer() {
         long period = parameterService.getParameter().getStaleReqCheckPeriodInMins() * MILLISECONDS_PER_MINUTE;
         Timer staleReqTimer = new Timer("StaleReqTimer");
-        staleReqTimer.schedule(new StaleReqTimerTask(designationRepository, notificationService, period),
+        staleReqTimer.schedule(new StaleReqTimerTask(designationRepository, emailService, poolService, period),
                 TIMER_DELAY, period);
     }
 

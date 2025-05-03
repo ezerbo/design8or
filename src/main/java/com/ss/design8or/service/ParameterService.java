@@ -1,10 +1,11 @@
 package com.ss.design8or.service;
 
-import com.ss.design8or.error.exception.ParametersNotFoundException;
+import com.ss.design8or.config.WebSocketEndpoints;
+import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.model.Parameter;
 import com.ss.design8or.repository.ParameterRepository;
-import com.ss.design8or.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,19 +20,19 @@ public class ParameterService {
 
 	private final RotationService rotationService;
 
-	private final NotificationService notificationService;
+	private final SimpMessagingTemplate simpMessagingTemplate;
 
 	public Parameter getParameter() {
 		return repository.findAll()
 				.stream()
 				.findFirst()
-				.orElseThrow(ParametersNotFoundException::new);
+				.orElseThrow(() -> new ResourceNotFoundException("No parameter found."));
 	}
 	
 	public Parameter save(Parameter parameter) {
 		parameter.setId(1L);
 		rotationService.reschedule(parameter.getRotationTime());
-		notificationService.emitParametersUpdateEvent(parameter);
+		simpMessagingTemplate.convertAndSend(WebSocketEndpoints.PARAMETERS_CHANNEL, parameter);
 		return repository.save(parameter);
 	}
 }

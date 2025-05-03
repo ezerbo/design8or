@@ -1,9 +1,9 @@
 package com.ss.design8or.service;
 
-import com.ss.design8or.error.exception.EmailAddressInUseException;
-import com.ss.design8or.error.exception.UserNotFoundException;
+import com.ss.design8or.error.exception.ResourceInUseException;
+import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.repository.UserRepository;
-import com.ss.design8or.rest.request.CreateUserRequest;
+import com.ss.design8or.rest.request.UserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +34,18 @@ public class UserServiceTests {
 	
 	@Test
 	public void createThrowsEmailInUseException() {
-		CreateUserRequest request = CreateUserRequest.builder()
+		UserRequest request = UserRequest.builder()
 				.emailAddress("chopper.tonytony@onepiece.com")
 				.build();
-		EmailAddressInUseException exception = assertThrows(EmailAddressInUseException.class,
+		ResourceInUseException exception = assertThrows(ResourceInUseException.class,
 				() -> service.create(request));
 		assertThat(exception.getMessage())
-				.isEqualTo("Email address 'chopper.tonytony@onepiece.com' is already in use");
+				.isEqualTo("Email address already in use");
 	}
 	
 	@Test
 	public void createAddsANewUser() {
-		CreateUserRequest request = CreateUserRequest.builder()
+		UserRequest request = UserRequest.builder()
 				.firstName("NewUser")
 				.lastName("NewUser")
 				.emailAddress("newuser.newuser@onepiece.com")
@@ -56,8 +56,9 @@ public class UserServiceTests {
 	
 	@Test
 	public void deleteThrowsUserNotFoundException() {
-		UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> service.delete(0L));
-		assertThat(exception.getMessage()).isEqualTo("No user found with identifier: '0'");
+		ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+				() -> service.delete(0L));
+		assertThat(exception.getMessage()).isEqualTo("User with id 0 not found");
 	}
 	
 	@Test

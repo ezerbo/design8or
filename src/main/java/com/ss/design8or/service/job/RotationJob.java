@@ -20,6 +20,6 @@ public class RotationJob implements Job {
 	
 	@Override
 	public void execute(JobExecutionContext context) {
-		designationService.designate();
-	}
+        designationService.designate();
+    }
 }

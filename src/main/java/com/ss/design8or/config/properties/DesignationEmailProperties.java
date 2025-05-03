@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MailProperties {
+public class DesignationEmailProperties {
 
 	private String from;
 	
-	private String designationEmailSubject;
-	
-	private String designationResponseBaseUrl;
+	private String subject;
+
+	private String responseBaseUrl;
 }

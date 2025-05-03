@@ -10,5 +10,5 @@ public enum DesignationStatus {
 
 	REASSIGNED,
 
-	STALED
+	STALE
 }

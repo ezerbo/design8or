@@ -13,7 +13,7 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "app")
 public class ServiceProperties {
 	
-	private MailProperties mail = new MailProperties();
+	private DesignationEmailProperties designationEmail = new DesignationEmailProperties();
 	
 	private KeysProperties keys = new KeysProperties();
 
