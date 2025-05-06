@@ -2,14 +2,16 @@ package com.ss.design8or.service;
 
 import com.ss.design8or.error.exception.ResourceInUseException;
 import com.ss.design8or.error.exception.ResourceNotFoundException;
+import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.UserRepository;
-import com.ss.design8or.rest.request.UserRequest;
+import com.ss.design8or.controller.request.UserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,12 +26,15 @@ public class UserServiceTests {
 	
 	@Autowired
 	private UserRepository repository;
+
+	@Autowired
+	private DesignationRepository designationRepository;
 	
 	private UserService service;
 	
 	@BeforeEach
 	public void init() {
-		service = new UserService(repository);
+		service = new UserService(repository, designationRepository);
 	}
 	
 	@Test
@@ -70,18 +75,7 @@ public class UserServiceTests {
 	
 	@Test
 	public void findAllReturnsAllUsers() {
-		assertThat(service.findAll()).hasSize(5);
-	}
-	
-//	@Test
-//	public void getCurrentPoolCandidatesReturnAllCandidates() {
-//		assertThat(service.getCurrentPoolCandidates()).hasSize(3); //One Lead and one designated
-//	}
-	
-	@Test
-	public void getcurrentLeadReturnLead() {
-		assertThat(service.getCurrentLead()).isPresent();
-		assertThat(service.getCurrentLead().get().getEmailAddress()).isEqualTo("luffy.monkey@onpiece.com");
+		assertThat(service.findAll(PageRequest.of(0, 5))).hasSize(5);
 	}
 
 }

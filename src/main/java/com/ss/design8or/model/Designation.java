@@ -1,5 +1,6 @@
 package com.ss.design8or.model;
 
+import com.ss.design8or.model.enums.DesignationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name = "designation", catalog = "design8or_db")
 public class Designation {
+
+	// TODO Manually created or triggered by the system?
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

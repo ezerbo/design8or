@@ -3,19 +3,21 @@ package com.ss.design8or.service;
 import com.ss.design8or.config.WebSocketEndpoints;
 import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.model.*;
+import com.ss.design8or.model.enums.DesignationStatus;
 import com.ss.design8or.repository.DesignationRepository;
-import com.ss.design8or.rest.response.DesignationAnswer;
-import com.ss.design8or.rest.response.DesignationResponse;
-import com.ss.design8or.service.notification.EmailService;
+import com.ss.design8or.controller.response.DesignationAnswer;
+import com.ss.design8or.controller.response.DesignationResponse;
+import com.ss.design8or.service.communication.EmailService;
+import com.ss.design8or.service.communication.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author ezerbo
@@ -35,6 +37,8 @@ public class DesignationService {
     private final PoolService poolService;
 
     private final EmailService emailService;
+
+    private final PushNotificationService pushNotificationService;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -130,6 +134,7 @@ public class DesignationService {
         designation.setUserResponseDate(new Date());
         Assignment assignment = assignmentService.create(designation.getUser(), poolService.getCurrent());
         simpMessagingTemplate.convertAndSend(WebSocketEndpoints.ASSIGNMENTS_CHANNEL, assignment);
+        pushNotificationService.sendAssignmentMessage(designation.getUser());
         return designationRepository.save(designation);
     }
 
@@ -164,14 +169,27 @@ public class DesignationService {
                 .build();
     }
 
+    /**
+     * Designates a random user from the current pool of candidates.
+     *
+     * @return Designation response
+     */
     public DesignationResponse designate() {
         log.info("Designating next lead...");
-        return designate(poolService.getCurrentPoolCandidates()
-                .getFirst().getId());
+        List<Long> userIds = poolService.getCurrentPoolCandidates().stream()
+                .map(User::getId)
+                .sorted()
+                .toList();
+        long userId = new Random().nextInt(userIds.getFirst().intValue(), userIds.getLast().intValue());
+        return designate(userId);
     }
 
     public Optional<Designation> getCurrentDesignation() {
         return designationRepository.findOneByStatusNotIn(List.of(DesignationStatus.ACCEPTED));
+    }
+
+    public Page<Designation> findAll(Pageable pageable) {
+        return designationRepository.findAllByOrderByDesignationDateDesc(pageable);
     }
 
 }

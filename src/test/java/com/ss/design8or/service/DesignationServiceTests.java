@@ -1,15 +1,17 @@
 package com.ss.design8or.service;
 
 import com.ss.design8or.config.WebSocketEndpoints;
+import com.ss.design8or.controller.response.DesignationAnswer;
+import com.ss.design8or.controller.response.DesignationResponse;
 import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.model.*;
+import com.ss.design8or.model.enums.DesignationStatus;
 import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
-import com.ss.design8or.rest.response.DesignationAnswer;
-import com.ss.design8or.rest.response.DesignationResponse;
-import com.ss.design8or.service.notification.EmailService;
+import com.ss.design8or.service.communication.EmailService;
+import com.ss.design8or.service.communication.PushNotificationService;
 import org.assertj.core.util.DateUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +52,9 @@ public class DesignationServiceTests {
     @MockitoBean
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    @MockitoBean
+    private PushNotificationService pushNotificationService;
+
     @Autowired
     private DesignationRepository designationRepository;
 
@@ -61,9 +66,9 @@ public class DesignationServiceTests {
     @BeforeEach
     public void init() {
         poolService = new PoolService(poolRepository, userRepository, designationRepository);
-        service = new DesignationService(new UserService(userRepository),
-                designationRepository, new AssignmentService(userRepository, assignmentRepository),
-                poolService, emailService, simpMessagingTemplate);
+        service = new DesignationService(new UserService(userRepository, designationRepository),
+                designationRepository, new AssignmentService(assignmentRepository),
+                poolService, emailService, pushNotificationService, simpMessagingTemplate);
     }
 
     @Test

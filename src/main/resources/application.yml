@@ -53,7 +53,8 @@ app:
     private-key: PyHDwHGKXXt5Ge9phcghR0TMo53ABZCIn2PpjcbWiuQ
 
   rotation:
-    cron-expression: 0 %s %s ? * * *
+    cron-expression: "0 0 10 ? * *" # Every day at 10 AM, 0 * * ? * * every minute
+    stale-req-check-time-in-mins: 30
 
   designation-email:
     from: zerboedouard@gmail.com

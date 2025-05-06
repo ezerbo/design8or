@@ -57,7 +57,7 @@ public class ContextConfig {
 		executor.setCorePoolSize(10);
 		executor.setMaxPoolSize(10);
 		executor.setQueueCapacity(30);
-		executor.setThreadNamePrefix("Notification-");
+		executor.setThreadNamePrefix("Comm-");
 		executor.initialize();
 		return executor;
 	}

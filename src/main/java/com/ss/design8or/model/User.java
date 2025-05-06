@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author ezerbo
@@ -18,7 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"assignments", "designations"})
-@EqualsAndHashCode(exclude = {"assignments", "designations"})
 @Table(name = "user", catalog = "design8or_db")
 public class User {
 
@@ -39,9 +39,6 @@ public class User {
 	@Column(name = "email_address", unique = true, nullable = false)
 	private String emailAddress;
 	
-	@Column(name = "is_lead")
-	public boolean lead; //TODO use assignment status to determine lead.
-	
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Assignment> assignments;
@@ -49,5 +46,18 @@ public class User {
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Designation> designations;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		User user = (User) o;
+		return Objects.equals(id, user.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 }

@@ -1,8 +1,8 @@
 package com.ss.design8or.service;
 
 import com.ss.design8or.model.Assignment;
+import com.ss.design8or.model.AssignmentId;
 import com.ss.design8or.model.Pool;
-import com.ss.design8or.model.PoolStatus;
 import com.ss.design8or.model.User;
 import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.PoolRepository;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.Date;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,20 +39,25 @@ public class AssignmentServiceTests {
 	
 	@BeforeEach
 	public void init() {
-		service = new AssignmentService(userRepository, repository);
+		service = new AssignmentService(repository);
 	}
 
 	@Test
-	public void createAssignmentSetsUserAsLead() {
-		User oldLead = userRepository.findByLeadTrue().get();
-		User user = userRepository.findById(3L).get();
-		Pool currentPool = poolRepository.findOneByStatus(PoolStatus.STARTED).get();
+	public void createAssignment() {
+		Optional<Pool> currentPoolOp = poolRepository.findById(3L);
+		assertThat(currentPoolOp).isPresent();
+		Pool currentPool = currentPoolOp.get();
+		Optional<User> userOp = userRepository.findById(3L);
+		assertThat(userOp).isPresent();
+		User user = userOp.get();
+		AssignmentId assignmentId = AssignmentId.builder()
+				.userId(user.getId())
+				.poolId(currentPool.getId())
+				.build();
+		Optional<Assignment> assignmentOptional = repository.findById(assignmentId);
+		assertThat(assignmentOptional).isEmpty();
 		Assignment assignment = service.create(user, currentPool);
-		User newLead = userRepository.findByLeadTrue().get();
-		assertThat(newLead).isNotSameAs(oldLead);
-		assertThat(newLead.getEmailAddress()).isEqualTo("zoro.roronoa@onpiece.com");
-		assertThat(oldLead.getEmailAddress()).isEqualTo("luffy.monkey@onpiece.com");
-		assertThat(assignment.getAssignmentDate()).isEqualToIgnoringSeconds(new Date());
-		assertThat(assignment.getPool()).isSameAs(currentPool);
+		assertThat(repository.findById(assignmentId)).isPresent();
+		assertThat(assignment.getAssignmentDate()).isToday();
 	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.ss.design8or.model.enums.PoolStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +49,10 @@ public class Pool {
 	@JsonIgnore
 	@OneToMany(mappedBy = "pool", orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Assignment> assignments;
+
+	public boolean hasEnded() {
+		return status == PoolStatus.ENDED;
+	}
 	
 	@PrePersist
 	public void onCreate() {

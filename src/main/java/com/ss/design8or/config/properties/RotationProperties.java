@@ -6,4 +6,6 @@ import lombok.Data;
 public class RotationProperties {
 
     private String cronExpression;
+
+    private int staleReqCheckTimeInMins;
 }

@@ -2,11 +2,16 @@ package com.ss.design8or.service;
 
 import com.ss.design8or.error.exception.ResourceInUseException;
 import com.ss.design8or.error.exception.ResourceNotFoundException;
+import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.enums.DesignationStatus;
 import com.ss.design8or.model.User;
+import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.UserRepository;
-import com.ss.design8or.rest.request.UserRequest;
+import com.ss.design8or.controller.request.UserRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +27,11 @@ import java.util.Optional;
 public class UserService {
 
 	private final UserRepository repository;
+
+	private final DesignationRepository designationRepository;
 	
 	public User create(UserRequest request) {
-		if (repository.existsByEmailAddress(request.getEmailAddress())) {
-			log.error("Email address already in use");
-			throw new ResourceInUseException("Email address already in use");
-		}
+		validateEmailAddress(request.getEmailAddress());
 		User user = User.builder()
 				.emailAddress(request.getEmailAddress())
 				.firstName(request.getFirstName())
@@ -38,10 +42,8 @@ public class UserService {
 
 	public User update(UserRequest userRequest, Long id) {
 		User user = findById(id);
-		if (!userRequest.getEmailAddress().equalsIgnoreCase(user.getEmailAddress())
-				&& repository.existsByEmailAddress(user.getEmailAddress())) {
-			log.error("Email address '{}' already in use", user.getEmailAddress());
-			throw new ResourceInUseException("Email address already in use");
+		if (!userRequest.getEmailAddress().equalsIgnoreCase(user.getEmailAddress())) {
+			validateEmailAddress(userRequest.getEmailAddress());
 		}
 		user.setEmailAddress(userRequest.getEmailAddress());
 		user.setFirstName(userRequest.getFirstName());
@@ -49,18 +51,25 @@ public class UserService {
 		return repository.save(user);
 	}
 
+	private void validateEmailAddress(String emailAddress) {
+		if (repository.findByEmailAddress(emailAddress).isPresent()) {
+			log.error("Email address already in use");
+			throw new ResourceInUseException("Email address already in use");
+		}
+	}
+
+	public Optional<User> designatedUser() {
+		return designationRepository.findOneByStatusNotIn(List.of(DesignationStatus.ACCEPTED))
+				.map(Designation::getUser);
+	}
 	
 	public void delete(Long id) {
 		User user = findById(id);
 		repository.delete(user);
 	}
 	
-	public List<User> findAll() {
-		return repository.findAll();
-	}
-	
-	public Optional<User> getCurrentLead() {
-		return repository.findByLeadTrue();
+	public Page<User> findAll(Pageable pageable) {
+		return repository.findAll(pageable);
 	}
 
 	public Optional<User> getOne(Long id) {

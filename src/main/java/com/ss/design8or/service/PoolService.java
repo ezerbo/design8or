@@ -1,15 +1,19 @@
 package com.ss.design8or.service;
 
+import com.ss.design8or.error.exception.ResourceNotFoundException;
 import com.ss.design8or.model.*;
+import com.ss.design8or.model.enums.DesignationStatus;
+import com.ss.design8or.model.enums.PoolStatus;
 import com.ss.design8or.repository.DesignationRepository;
 import com.ss.design8or.repository.PoolRepository;
 import com.ss.design8or.repository.UserRepository;
-import com.ss.design8or.rest.response.GetPoolsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -25,10 +29,6 @@ public class PoolService {
 
     private final DesignationRepository designationRepository;
 
-    public Optional<User> getCurrentLead() {
-        return userRepository.findByLeadTrue();
-    }
-
     public Pool getCurrent() {
         return poolRepository.findOneByStatus(PoolStatus.STARTED)
                 .filter(pool -> pool.getAssignments().size() < userRepository.count())
@@ -38,40 +38,43 @@ public class PoolService {
                 });
     }
 
-    public GetPoolsResponse getPools() {
-        Pool currentPool = getCurrent();
-        long assignmentsCount = currentPool.getAssignments().size();
-        return GetPoolsResponse.builder()
-                .pools(poolRepository.findAllByOrderByStartDateDesc())
-                .currentLead(userRepository.findByLeadTrue().orElse(null))
-                .progress(calculateProgress(assignmentsCount))
-                .participantsCount(assignmentsCount)
-                .build();
+    public Page<Pool> findAll(Pageable pageable) {
+        return poolRepository.findAllByOrderByStartDateDesc(pageable);
     }
 
-    public List<User> getCurrentPoolCandidates() {
-        List<User> participants = getParticipants();
+    public Optional<User> getLead(long poolId) {
+        return poolRepository.findById(poolId)
+                .filter(Predicate.not(Pool::hasEnded))
+                .map(pool -> pool.getAssignments().stream()
+                        .max(Comparator.comparing(Assignment::getAssignmentDate)))
+                .map(assignment -> assignment.map(Assignment::getUser))
+                .orElseThrow(() -> new ResourceNotFoundException("Pool not found or has ended"));
+    }
+
+    public List<User> getParticipants(long poolId) {
+        return poolRepository.findById(poolId)
+                .map(pool -> pool.getAssignments().stream()
+                        .map(Assignment::getUser).toList())
+                .orElseThrow(() -> new ResourceNotFoundException("Pool not found"));
+    }
+
+    public List<User> getCandidates(long poolId) {
+        Optional<User> designatedUser = getDesignatedUser();
+        List<User> participants = getParticipants(poolId);
         return userRepository.findAll()
                 .stream()
                 .filter(Predicate.not(participants::contains))
+                .filter(Predicate.not(user -> designatedUser.map(user::equals).orElse(false)))
                 .toList();
     }
 
-    private List<User> getParticipants() {
-        List<User> participants = new ArrayList<>(getCurrent()
-                .getAssignments()
-                .stream()
-                .map(Assignment::getUser)
-                .toList());
-        designationRepository.findOneByStatusNotIn(List.of(DesignationStatus.ACCEPTED))
-                .map(Designation::getUser)
-                .ifPresent(participants::add);
-        return participants;
+    public List<User> getCurrentPoolCandidates() {
+        return getCandidates(getCurrent().getId());
     }
 
-    private long calculateProgress(long participantsCount) {
-        long usersCount = userRepository.count();
-        return usersCount == 0 ? 0 : 100 * (participantsCount / usersCount);
+    private Optional<User> getDesignatedUser() {
+        return designationRepository.findOneByStatusNotIn(List.of(DesignationStatus.ACCEPTED))
+                .map(Designation::getUser);
     }
 
 }
