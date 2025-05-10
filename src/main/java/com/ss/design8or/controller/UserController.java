@@ -33,8 +33,9 @@ public class UserController {
 	private final DesignationService designationService;
 
 	@GetMapping
-	public ResponseEntity<List<User>> getAll(@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
-											 @RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
+	public ResponseEntity<List<User>> getAll(
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
 		Page<User> usersPage = service.findAll(PageRequest.of(page, size));
 		return ResponseEntity.ok()
 				.headers(PaginationUtils.getPaginationHeaders(usersPage))

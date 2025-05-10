@@ -19,7 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"assignments", "designations"})
-@Table(name = "user", catalog = "design8or_db")
+@Table(name = "user")
 public class User {
 
 	@Id

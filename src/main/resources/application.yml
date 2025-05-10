@@ -34,6 +34,10 @@ spring:
     init:
       data-locations: classpath:data/data.sql
 
+  web:
+    resources:
+      static-locations: classpath:/email-icons/
+
 springdoc:
   api-docs:
     path: /api-docs
@@ -47,11 +51,6 @@ app:
     allowed-origins:
     - http://localhost:4200
 
-  keys:
-    subject: zerboedouard@gmail.com
-    public-key: BF_aZ-cmliVi5qbtxhGZrxxGZtEys0aLjZLhmtrboGtGiV__OxZa_emH2spKWNx8lZni_11a4oUJCfuEdT8x5rg
-    private-key: PyHDwHGKXXt5Ge9phcghR0TMo53ABZCIn2PpjcbWiuQ
-
   rotation:
     cron-expression: "0 0 10 ? * *" # Every day at 10 AM, 0 * * ? * * every minute
     stale-req-check-time-in-mins: 30
@@ -59,4 +58,9 @@ app:
   designation-email:
     from: zerboedouard@gmail.com
     subject: You have been selected to be the lead
-    response-base-url: http://localhost:8080
+    service-base-url: http://localhost:8080
+
+  browser-push-notification-keys:
+    subject: Designation Event
+    public-key: BOsT9tYV7LuR21EAs5AZ6qCwb9zsD8RRApInBOwVJwD5EOzYfoyPfbP0M0CYXI14lscch43JSiPO45b-B_n-dJo
+    private-key: 7W5kxKIZUZ8yysvSUbW2mtNPou9HmpajsES2JRmAZO0

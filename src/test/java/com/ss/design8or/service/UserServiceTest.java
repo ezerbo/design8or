@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-public class UserServiceTests {
+public class UserServiceTest {
 	
 	@Autowired
 	private UserRepository repository;

@@ -27,8 +27,9 @@ public class PoolController {
 	private final PoolService poolService;
 
 	@GetMapping
-	public ResponseEntity<List<Pool>> findAll(@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
-											 @RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
+	public ResponseEntity<List<Pool>> findAll(
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
 		Page<Pool> poolsPage = poolService.findAll(PageRequest.of(page, size));
 		return ResponseEntity.ok()
 				.headers(PaginationUtils.getPaginationHeaders(poolsPage))

@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "assignment", catalog = "design8or_db")
+@Table(name = "assignment")
 public class Assignment {
 	
 	@EmbeddedId

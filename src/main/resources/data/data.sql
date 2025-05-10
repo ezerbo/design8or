@@ -1,17 +1,17 @@
-insert into design8or_db.user(id, first_name, last_name, email_address) values (1, 'Chopper', 'TONY TONY', 'chopper.tonytony@onepiece.com');
-insert into design8or_db.user(id, first_name, last_name, email_address) values (2, 'Luffy'  , 'MONKEY D.', 'luffy.monkey@onpiece.com'     );
-insert into design8or_db.user(id, first_name, last_name, email_address) values (3, 'Zoro'   , 'RORONOA'  , 'zoro.roronoa@onpiece.com'     );
-insert into design8or_db.user(id, first_name, last_name, email_address) values (4, 'Robin'  , 'NICO'     , 'robin.nico@onpiece.com'       );
-insert into design8or_db.user(id, first_name, last_name, email_address) values (5, 'Sandji' , 'VINSMOKE' , 'sandji.vinsmoke@onpiece.com'  );
+insert into user(id, first_name, last_name, email_address) values (1, 'Chopper', 'Tony Tony', 'chopper.tonytony@onepiece.com');
+insert into user(id, first_name, last_name, email_address) values (2, 'Luffy'  , 'Monkey D.', 'luffy.monkey@onpiece.com'     );
+insert into user(id, first_name, last_name, email_address) values (3, 'Zoro'   , 'Roronoa'  , 'zoro.roronoa@onpiece.com'     );
+insert into user(id, first_name, last_name, email_address) values (4, 'Robin'  , 'Nico'     , 'robin.nico@onpiece.com'       );
+insert into user(id, first_name, last_name, email_address) values (5, 'Sandji' , 'Vinsmoke' , 'sandji.vinsmoke@onpiece.com'  );
+
+insert into pool(id, start_date, end_date, status) values (1, current_timestamp() - 20, current_timestamp() - 10, 'ENDED');
+insert into pool(id, start_date, end_date, status) values (2, current_timestamp() - 10, current_timestamp() - 1, 'ENDED');
+insert into pool(id, start_date, end_date, status) values (3, current_timestamp() - 1 , null, 'STARTED'); --Current Pool
 
 -- TODO Add assignments for past pools
-insert into design8or_db.pool(id, start_date, end_date, status) values (1, current_timestamp() - 20, current_timestamp() - 10, 'ENDED');
-insert into design8or_db.pool(id, start_date, end_date, status) values (2, current_timestamp() - 10, current_timestamp() - 1, 'ENDED');
-insert into design8or_db.pool(id, start_date, end_date, status) values (3, current_timestamp() - 1 , null, 'STARTED'); --Current Pool
+--insert into assignment(user_id, pool_id, assignment_date) values (1, 3, current_timestamp());
 
---insert into design8or_db.assignment(user_id, pool_id, assignment_date) values (1, 3, current_timestamp());
+insert into designation(id, user_id, status, designation_date, user_response_date) values (1, 1, 'PENDING', current_timestamp(), null);
+insert into designation(id, user_id, status, designation_date, user_response_date) values (2, 1, 'ACCEPTED', current_timestamp() - 30, current_timestamp());
 
-insert into design8or_db.designation(id, user_id, status, designation_date, user_response_date) values (1, 1, 'PENDING', current_timestamp(), null);
-insert into design8or_db.designation(id, user_id, status, designation_date, user_response_date) values (2, 1, 'ACCEPTED', current_timestamp() - 30, current_timestamp());
-
-insert into design8or_db.subscription(id, endpoint, auth, p256dh) values (1, 'https://updates.push.services.mozilla.com/wpush/v2/gAAAAABcPiOX6tDTL0Bw71YmkhFC6BIX9gqONNi5G9Kt-tZazQaQaDXy9aU1dlu05hn_M83QZAG934MKcEf5SHmNb_dgGy3gmgGDFIwLaqxkZY7VIZWW2MkiN2Y9eykWsddpvnAQpJgoliCbhXlYgSABRBySIbjEbNjZhrjpMk3mhu7rCh8kV44', '2qgYJgh4VpltYBflQ1UQSg', 'BLHL6tGJCc3NQW_Btq_izk9sbmh_FrJ8ybfYfe6UxD2XiDBv6gWitDvQPt3o-g4IXYSkrnA0t6nCncitW5F0-VQ');
+insert into subscription(id, endpoint, auth, p256dh) values (1,'https://fcm.googleapis.com/fcm/send/euk_xuj3yc0:APA91bGxe51K6d9ISyYnBDsb8lAmO2LsVGgXogF5kgxyn4wxPehuqlZuwtZNf_tKKWMheskVFy79IPqeWTsE1Y10jRhbEMeKpFBVbMJ_u2M1XlHtWZULOdzkxOTxbsQCSxQ_TX5Y2wMV','04pI3N9c5uS3O9yxoev0WA','BAG6aC0Y_R-Lp3qCUgDI9_YFD_kFfk9hw6OW_vMgGzdUciP0qJuq4EgvIvGLsiVMJiKlwAeaeg9xhyPwbMskuT8');

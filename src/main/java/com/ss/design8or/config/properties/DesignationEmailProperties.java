@@ -19,5 +19,5 @@ public class DesignationEmailProperties {
 	
 	private String subject;
 
-	private String responseBaseUrl;
+	private String serviceBaseUrl;
 }

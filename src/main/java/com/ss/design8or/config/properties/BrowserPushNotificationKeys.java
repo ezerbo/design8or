@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KeysProperties {
+public class BrowserPushNotificationKeys {
 
 	private String publicKey;
 

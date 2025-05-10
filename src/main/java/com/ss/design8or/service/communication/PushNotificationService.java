@@ -1,29 +1,20 @@
 package com.ss.design8or.service.communication;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Security;
-import java.time.LocalDateTime;
-
-import jakarta.annotation.PostConstruct;
-
-import lombok.RequiredArgsConstructor;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jose4j.lang.JoseException;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ss.design8or.config.properties.ServiceProperties;
-import com.ss.design8or.config.properties.KeysProperties;
+import com.ss.design8or.controller.request.SubscriptionRequest;
+import com.ss.design8or.error.exception.ResourceInUseException;
+import com.ss.design8or.error.exception.ResourceNotFoundException;
+import com.ss.design8or.error.exception.ServiceException;
 import com.ss.design8or.model.Subscription;
-import com.ss.design8or.model.User;
 import com.ss.design8or.repository.SubscriptionRepository;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
+import org.apache.http.HttpResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 /**
  * @author ezerbo
@@ -34,69 +25,66 @@ import nl.martijndwars.webpush.PushService;
 @RequiredArgsConstructor
 public class PushNotificationService {
 
-    private PushService pushService;
-
-	private final ObjectMapper objectMapper;
+    private final PushService pushService;
 
 	private final SubscriptionRepository subscriptionRepository;
 
-	private final ServiceProperties properties;
+	public Subscription createSubscription(SubscriptionRequest request) {
+		log.debug("Creating subscription: {}", request);
+		return (Subscription) subscriptionRepository.findByEndpoint(request.getEndpoint())
+				.map(s -> {
+					log.error("Subscription already exists");
+					throw new ResourceInUseException("Subscription already exists");
+				})
+				.orElseGet(() -> {
+					log.debug("Subscription does not exist, creating a new one");
+					return subscriptionRepository.save(request.toSubscription());
+				});
+	}
 
-	
-	@PostConstruct
-	public void init() throws GeneralSecurityException {
-		Security.addProvider(new BouncyCastleProvider());//TODO Go over java security providers
-        KeysProperties keys = properties.getKeys();
-		pushService = new PushService(keys.getPublicKey(), keys.getPrivateKey(), keys.getSubject());
+	public Page<Subscription> getSubscriptions(Pageable pageable) {
+		return subscriptionRepository.findAll(pageable);
 	}
 	
 	@Async
-	public void sendAssignmentMessage(User lead) {
-		subscriptionRepository.findAll().stream()
-			.map(s -> toNotification(s, getAssignmentEventPayload(lead)))
-			.forEach(this::sendAsync);
+	public void sendAssignmentNotification(String emailAddress) {
+		subscriptionRepository.findAll()
+				.stream()
+				.map(s -> createPushNotification(s, String.format("%s is the new lead", emailAddress)))
+				.forEach(this::sendAsync);
 	}
 
 	private void sendAsync(Notification notification) {
 		try {
 			pushService.sendAsync(notification);
-		} catch (GeneralSecurityException | IOException | JoseException e) {
-			log.error("Unable to send email", e);
+		} catch (Exception e) {
+			log.error("Unable to send push notification {}", notification, e);
+			throw new ServiceException(
+					String.format("Unable to send push notification: %s. Error: %s", notification, e.getMessage()));
 		}
 	}
 
-	private Notification toNotification(Subscription s, String payload) {
-		log.info("Sending push notification to '{}'", s.getEndpoint());
+	private Notification createPushNotification(Subscription s, String payload) {
+		log.debug("Sending push notification: {}", s);
 		try {
 			return new Notification(s.getEndpoint(), s.getP256dh(), s.getAuth(), payload);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private String getAssignmentEventPayload(User user) {
-		NotificationPayload payload = NotificationPayload.builder()
-				.notification(buildNotification(user.getEmailAddress()))
-				.build();
+
+	public void sendNotification(long subscriptionId, String payload) {
+		log.debug("Sending push notification. Subscription id: {}", subscriptionId);
+		Subscription s = subscriptionRepository.findById(subscriptionId)
+				.orElseThrow(() -> new ResourceNotFoundException("Subscription not found"));
 		try {
-			return objectMapper.writeValueAsString(payload);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Unable to parse event payload.");
+			HttpResponse httpResponse = pushService.send(new Notification(s.getEndpoint(),
+					s.getP256dh(), s.getAuth(), payload));
+			log.info("Push notification sent: {}", httpResponse.getStatusLine());
+		} catch (Exception e) {
+			log.error("Unable to send push notification {}", s, e);
+			throw new ServiceException(
+					String.format("Unable to send push notification: %s. Error: %s", s, e.getMessage()));
 		}
-	}
-	
-	private com.ss.design8or.service.communication.Notification buildNotification(String emailAddress) {
-		return com.ss.design8or.service.communication.Notification.builder()
-				.title("Design8or")
-				.body(String.format("%s is the new lead", emailAddress))
-				.data(getNotificationData())
-				.build();
-	}
-	
-	private NotificationData getNotificationData() {
-		return NotificationData.builder()
-				.dateOfArrival(LocalDateTime.now())
-				.primaryKey(1L)
-				.build();
 	}
 }

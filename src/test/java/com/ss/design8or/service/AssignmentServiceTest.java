@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-public class AssignmentServiceTests {
+public class AssignmentServiceTest {
 	
 	@Autowired
 	private UserRepository userRepository;

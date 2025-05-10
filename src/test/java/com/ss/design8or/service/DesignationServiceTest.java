@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-public class DesignationServiceTests {
+public class DesignationServiceTest {
 
     @Autowired
     private PoolRepository poolRepository;

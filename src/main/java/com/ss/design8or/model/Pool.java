@@ -26,7 +26,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(exclude = {"assignments"})
 @EqualsAndHashCode(exclude = {"assignments"})
-@Table(name = "pool", catalog = "design8or_db")
+@Table(name = "pool")
 public class Pool {
 	
 	@Id

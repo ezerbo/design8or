@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(catalog = "design8or_db", name = "subscription")
+@Table(name = "subscription")
 public class Subscription {
 
 	@Id

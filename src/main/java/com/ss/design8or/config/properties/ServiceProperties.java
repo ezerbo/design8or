@@ -15,7 +15,7 @@ public class ServiceProperties {
 	
 	private DesignationEmailProperties designationEmail = new DesignationEmailProperties();
 	
-	private KeysProperties keys = new KeysProperties();
+	private BrowserPushNotificationKeys browserPushNotificationKeys = new BrowserPushNotificationKeys();
 
 	private RotationProperties rotation = new RotationProperties();
 	

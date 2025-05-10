@@ -134,7 +134,7 @@ public class DesignationService {
         designation.setUserResponseDate(new Date());
         Assignment assignment = assignmentService.create(designation.getUser(), poolService.getCurrent());
         simpMessagingTemplate.convertAndSend(WebSocketEndpoints.ASSIGNMENTS_CHANNEL, assignment);
-        pushNotificationService.sendAssignmentMessage(designation.getUser());
+        pushNotificationService.sendAssignmentNotification(designation.getUser().getEmailAddress());
         return designationRepository.save(designation);
     }
 

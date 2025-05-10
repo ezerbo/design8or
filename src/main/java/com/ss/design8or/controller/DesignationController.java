@@ -35,8 +35,9 @@ public class DesignationController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Designation>> findAll(@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page,
-													 @RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size) {
+	public ResponseEntity<List<Designation>> findAll(
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size) {
 		Page<Designation> designationsPage = service.findAll(PageRequest.of(page, size));
 		return ResponseEntity.ok()
 				.headers(PaginationUtils.getPaginationHeaders(designationsPage))

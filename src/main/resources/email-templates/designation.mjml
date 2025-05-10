@@ -1,0 +1,60 @@
+<mjml>
+  <mj-head>
+    <mj-title>Designation Notification</mj-title>
+    <mj-preview>You have a new designation request</mj-preview>
+    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto" />
+    <mj-style inline="inline">
+      .bold-text {
+        font-weight: bold;
+        font-size: 20px;
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f5f5f5">
+    <mj-section background-color="#ffffff" padding="20px" border-radius="6px">
+      <mj-column>
+        <mj-image width="120px" src="http://localhost:8080/design8or.png" />
+        <mj-text align="center" font-size="22px" css-class="bold-text">Design8or</mj-text>
+        <mj-divider border-color="#ccc" />
+
+        <mj-text font-size="16px" line-height="24px">
+          <!-- Conditional content -->
+          <span th:if="${!isDeclined}">
+            Howdy <span th:text="|${user.firstName} ${user.lastName}|">Edouard ZERBO</span>,<br />
+            you have been selected to be the lead.
+          </span>
+
+          <span th:if="${isDeclined}">
+            Howdy <span th:text="|${user.firstName} ${user.lastName}|">Edouard ZERBO</span>,<br />
+            <span th:text="|${lead.firstName} ${lead.lastName}|">Jane Doe</span> has declined a designation request.<br />
+            Do you mind being the lead today?
+          </span>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Buttons on the same line -->
+    <mj-section background-color="#ffffff" padding-bottom="20px">
+  <mj-column width="50%">
+    <mj-button width="70%" background-color="#28a745" color="#ffffff" font-size="16px"
+               href="[[${responseUrl}]]&answer=ACCEPT" padding="10px 0" border-radius="4px">
+      Count on me!
+    </mj-button>
+  </mj-column>
+  <mj-column width="50%">
+    <mj-button width="70%" background-color="#dc3545" color="#ffffff" font-size="16px"
+               href="[[${responseUrl}]]&answer=DECLINE" padding="10px 0" border-radius="4px">
+      Sorry, not today
+    </mj-button>
+  </mj-column>
+</mj-section>
+
+    <mj-section padding="10px 0">
+      <mj-column>
+        <mj-text font-size="12px" color="#777" align="center">
+          &copy; SimpleSoft [[${#dates.format(#dates.createNow(), 'yyyy')}]]
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -18,7 +18,7 @@ import java.util.Date;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "designation", catalog = "design8or_db")
+@Table(name = "designation")
 public class Designation {
 
 	// TODO Manually created or triggered by the system?
