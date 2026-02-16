@@ -22,6 +22,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.Date;
 import java.util.Optional;
 
@@ -251,7 +254,8 @@ public class DesignationServiceTest {
         assertThat(designationOptional.isPresent()).isTrue();
         assertThat(designationOptional.get().getUser().getEmailAddress()).isEqualTo("chopper.tonytony@onepiece.com");
 
-        assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(3L).build())).isNotPresent();
+        long currentPoolId = poolService.getCurrent().getId();
+        assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(currentPoolId).build())).isNotPresent();
         DesignationResponse designationResponse = service.processResponse(1L,
                 "chopper.tonytony@onepiece.com", DesignationAnswer.ACCEPT);
         assertThat(designationResponse.getEmailAddress()).isEqualTo("chopper.tonytony@onepiece.com");
@@ -259,7 +263,7 @@ public class DesignationServiceTest {
                 .convertAndSend(eq(WebSocketEndpoints.ASSIGNMENTS_CHANNEL), any(Assignment.class));
 
         assertThat(designationRepository.findOneByStatus(DesignationStatus.PENDING)).isNotPresent();
-        assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(3L).build())).isPresent();
+        assertThat(assignmentRepository.findById(AssignmentId.builder().userId(1L).poolId(currentPoolId).build())).isPresent();
         assertThat(designationResponse.getStatus()).isEqualByComparingTo(DesignationStatus.ACCEPTED);
         assertThat(designationResponse.getMessage()).isEqualTo("Designation request successfully processed");
     }
@@ -299,6 +303,44 @@ public class DesignationServiceTest {
             poolRepository.save(pool);
         }
         designationRepository.save(currentDesignation);
+    }
+
+    @Test
+    public void acceptReassignsWhenEmailDoesNotMatch() {
+        Optional<Designation> currentDesignationOp = service.getCurrentDesignation();
+        assertThat(currentDesignationOp.isPresent()).isTrue();
+        Designation currentDesignation = currentDesignationOp.get();
+        assertThat(currentDesignation.getUser().getEmailAddress()).isEqualTo("chopper.tonytony@onepiece.com");
+
+        Designation accepted = service.accept(currentDesignation, "luffy.monkey@onpiece.com");
+        assertThat(accepted.getStatus()).isEqualTo(DesignationStatus.ACCEPTED);
+        assertThat(accepted.getUser().getEmailAddress()).isEqualTo("luffy.monkey@onpiece.com");
+        verify(emailService, times(1)).sendReassignmentEmail(any(User.class));
+        verify(emailService, times(1)).sendEmail(any(Designation.class));
+        verify(simpMessagingTemplate, times(1))
+                .convertAndSend(eq(WebSocketEndpoints.ASSIGNMENTS_CHANNEL), any(Assignment.class));
+    }
+
+    @Test
+    public void declineByNonDesignatedUserIsIgnored() {
+        Optional<Designation> currentDesignationOp = service.getCurrentDesignation();
+        assertThat(currentDesignationOp.isPresent()).isTrue();
+        Designation currentDesignation = currentDesignationOp.get();
+        assertThat(currentDesignation.getStatus()).isEqualTo(DesignationStatus.PENDING);
+
+        Designation designation = service.decline(currentDesignation, "luffy.monkey@onpiece.com");
+        assertThat(designation.getStatus()).isEqualTo(DesignationStatus.PENDING);
+        verify(emailService, never()).broadcastDeclinationEmail(any(), anyList());
+        verify(simpMessagingTemplate, never())
+                .convertAndSend(eq(WebSocketEndpoints.DESIGNATIONS_CHANNEL), any(Designation.class));
+    }
+
+    @Test
+    public void findAllReturnsDesignationsOrderedByDate() {
+        Page<Designation> page = service.findAll(PageRequest.of(0, 10));
+        assertThat(page).isNotEmpty();
+        assertThat(page.getContent().getFirst().getDesignationDate())
+                .isAfterOrEqualTo(page.getContent().getLast().getDesignationDate());
     }
 
     private void runAssignmentCreationAssertions(DesignationResponse designationResponse) {
