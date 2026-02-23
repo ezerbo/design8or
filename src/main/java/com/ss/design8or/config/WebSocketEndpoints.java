@@ -10,9 +10,7 @@ public class WebSocketEndpoints {
 
 	public static final String DESIGNATIONS_CHANNEL = "/designations";
 
-	public static final String ASSIGNMENTS_CHANNEL = "/assignments";
-
-	public static final String POOLS_CHANNEL = "/pools"; // <----- Pool notifications (new)
+	public static final String POOLS_CHANNEL = "/pools";
 
 	public static final String PARAMETERS_CHANNEL = "/parameters";
 

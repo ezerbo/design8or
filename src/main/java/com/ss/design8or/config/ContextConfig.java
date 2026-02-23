@@ -54,6 +54,9 @@ public class ContextConfig {
 		corsConfiguration.addAllowedMethod("PUT");
 		corsConfiguration.addAllowedMethod("DELETE");
 		corsConfiguration.addExposedHeader("X-Total-Count");
+		corsConfiguration.addExposedHeader("X-Page-Number");
+		corsConfiguration.addExposedHeader("X-Page-Size");
+		corsConfiguration.addExposedHeader("X-Total-Pages");
 		source.registerCorsConfiguration("/**", corsConfiguration);
 		return source;
 	}

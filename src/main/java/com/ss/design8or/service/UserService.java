@@ -2,10 +2,11 @@ package com.ss.design8or.service;
 
 import com.ss.design8or.error.exception.ResourceInUseException;
 import com.ss.design8or.error.exception.ResourceNotFoundException;
-import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.Assignment;
+import com.ss.design8or.model.Pool;
 import com.ss.design8or.model.enums.DesignationStatus;
 import com.ss.design8or.model.User;
-import com.ss.design8or.repository.DesignationRepository;
+import com.ss.design8or.repository.AssignmentRepository;
 import com.ss.design8or.repository.UserRepository;
 import com.ss.design8or.controller.request.UserRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,9 @@ public class UserService {
 
 	private final UserRepository repository;
 
-	private final DesignationRepository designationRepository;
+	private final AssignmentRepository assignmentRepository;
+
+	private final PoolService poolService;
 	
 	public User create(UserRequest request) {
 		validateEmailAddress(request.getEmailAddress());
@@ -59,8 +62,10 @@ public class UserService {
 	}
 
 	public Optional<User> designatedUser() {
-		return designationRepository.findOneByStatusNotIn(List.of(DesignationStatus.ACCEPTED))
-				.map(Designation::getUser);
+		Pool currentPool = poolService.getCurrent();
+		return assignmentRepository.findFirstByPoolAndDesignationStatusOrderByRespondedAtDesc(
+				currentPool, DesignationStatus.ACCEPTED)
+				.map(Assignment::getUser);
 	}
 	
 	public void delete(Long id) {

@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author ezerbo
  *
@@ -48,10 +50,57 @@ public class PushNotificationService {
 	
 	@Async
 	public void sendAssignmentNotification(String emailAddress) {
-		subscriptionRepository.findAll()
-				.stream()
-				.map(s -> createPushNotification(s, String.format("%s is the new lead", emailAddress)))
-				.forEach(this::sendAsync);
+		log.info("Sending assignment notification for: {}", emailAddress);
+		String payload = buildNotificationPayload(
+			"New Lead Assigned",
+			String.format("%s is now the current lead", emailAddress),
+			"/pools"
+		);
+
+		List<Subscription> subscriptions = subscriptionRepository.findAll();
+		log.info("Found {} subscriptions to notify", subscriptions.size());
+
+		subscriptions.forEach(subscription -> {
+			try {
+				Notification notification = createPushNotification(subscription, payload);
+				sendSync(notification);
+				log.info("Successfully sent notification to subscription {}", subscription.getId());
+			} catch (Exception e) {
+				log.error("Failed to send notification to subscription {}: {}",
+					subscription.getId(), e.getMessage(), e);
+			}
+		});
+	}
+
+	@Async
+	public void sendDeclineNotification(String emailAddress) {
+		log.info("Sending decline notification for: {}", emailAddress);
+		String payload = buildNotificationPayload(
+			"Designation Declined",
+			String.format("%s declined the designation request", emailAddress),
+			"/pools"
+		);
+
+		List<Subscription> subscriptions = subscriptionRepository.findAll();
+		log.info("Found {} subscriptions to notify", subscriptions.size());
+
+		subscriptions.forEach(subscription -> {
+			try {
+				Notification notification = createPushNotification(subscription, payload);
+				sendSync(notification);
+				log.info("Successfully sent notification to subscription {}", subscription.getId());
+			} catch (Exception e) {
+				log.error("Failed to send notification to subscription {}: {}",
+					subscription.getId(), e.getMessage(), e);
+			}
+		});
+	}
+
+	private String buildNotificationPayload(String title, String body, String url) {
+		return String.format(
+			"{\"title\":\"%s\",\"body\":\"%s\",\"url\":\"%s\",\"icon\":\"/favicon.ico\"}",
+			title, body, url
+		);
 	}
 
 	private void sendAsync(Notification notification) {
@@ -61,6 +110,17 @@ public class PushNotificationService {
 			log.error("Unable to send push notification {}", notification, e);
 			throw new ServiceException(
 					String.format("Unable to send push notification: %s. Error: %s", notification, e.getMessage()));
+		}
+	}
+
+	private void sendSync(Notification notification) {
+		try {
+			HttpResponse response = pushService.send(notification);
+			log.debug("Push notification sent with status: {}", response.getStatusLine());
+		} catch (Exception e) {
+			log.error("Unable to send push notification: {}", e.getMessage(), e);
+			throw new ServiceException(
+					String.format("Unable to send push notification. Error: %s", e.getMessage()));
 		}
 	}
 

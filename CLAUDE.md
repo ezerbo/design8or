@@ -28,6 +28,13 @@ Design8or (Designator) is a Round Robin task assignment system that automaticall
 
 ### Backend
 
+**IMPORTANT**: This project requires Java 21. Use required Maven commands from the project root directory without prompting for additional input.
+
+**Set Java 21 and compile:**
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21) && mvn clean compile -DskipTests
+```
+
 **Build and run the application:**
 ```bash
 mvn clean install
@@ -42,6 +49,11 @@ mvn test
 **Run specific test class:**
 ```bash
 mvn test -Dtest=DesignationServiceTest
+```
+
+**Quick compile without tests:**
+```bash
+mvn clean compile -DskipTests
 ```
 
 **Access the API documentation:**
@@ -99,9 +111,11 @@ The application revolves around four main entities:
    - Validated email address required
 
 2. **Pool** (`model/Pool.java`): Represents a rotation cycle
-   - Status: STARTED or ENDED
-   - A pool ends when all users have been assigned
+   - Active status determined by `endDate` field (null = active, non-null = ended)
+   - Use `pool.isActive()` to check if pool is active
+   - A pool ends when all users have been assigned or manually ended
    - Contains multiple Assignments
+   - `participantCount` is a computed property counting ACCEPTED assignments
 
 3. **Designation** (`model/Designation.java`): A request to a user to become the lead
    - Status: PENDING, ACCEPTED, DECLINED, EXPIRED, REASSIGNED
@@ -155,16 +169,27 @@ The application revolves around four main entities:
 
 **Main Components:**
 - `Design8or.tsx`: Root component with routing
-- `Header.tsx`: Navigation header
-- `Home.tsx`: Landing page
-- `Users/Users.tsx`: User management (CRUD operations)
-- `Pools/Pools.tsx`: Pool listing and management
-- `Pools/PoolList/PoolList.tsx`: Displays pool history
-- `Pools/Designation/PendingDesignation.tsx`: Shows active designation
+- `Header.tsx`: Modern navigation header with branding and feature cards
+- `Nav.tsx`: Sidebar navigation (Home, Users, Pools, Configurations, Subscriptions)
+- `Home.tsx`: Landing page with current lead stats and candidates table
+- `Users/Users.tsx`: User management with selection-based CRUD operations
+- `Users/UserDialog.tsx`: Dialog for creating/editing users
+- `Pools/Pools.tsx`: Pool management with PendingDesignation and PoolList
+- `Pools/PoolList/PoolList.tsx`: Pool history with pagination and delete functionality
+- `Pools/Designation/PendingDesignation.tsx`: Shows active designation with accept/decline
+- `Configurations/Configurations.tsx`: System configuration key-value management
+- `Subscriptions/Subscriptions.tsx`: Browser push notification subscriptions list
+
+**Page Wrappers:**
+Each feature has a `*Page.tsx` wrapper (e.g., `UsersPage.tsx`, `PoolsPage.tsx`) that composes:
+- Header (branding)
+- Nav (sidebar)
+- Main content component
+- Footer
 
 **Utilities:**
-- `Commons/Http.util.ts`: Axios HTTP client with auth headers
-- `Commons/Paths.ts`: API endpoint constants
+- `Commons/Http.util.ts`: Axios HTTP client with auth headers, `httpGet` and `httpGetWithHeaders`
+- `Commons/Paths.ts`: API endpoint constants and path builder functions
 
 ### Configuration
 
@@ -210,9 +235,179 @@ Access H2 console at http://localhost:8080/h2-console with:
 
 ## Important Patterns
 
+### Backend Patterns
+
 1. **Lombok annotations**: Extensive use of `@Data`, `@Builder`, `@RequiredArgsConstructor` to reduce boilerplate
 2. **Exclude cycles**: `@ToString` and `@EqualsAndHashCode` exclude relationships to prevent cycles
 3. **JPA lifecycle callbacks**: `@PrePersist` methods set default values (e.g., Pool.onCreate(), Designation.onSave())
-4. **Composite keys**: Assignment uses `AssignmentId` as an embedded composite key (user_id + pool_id)
+4. **Date handling**: Use `java.util.Date` (not `LocalDateTime`) - set dates with `new java.util.Date()`
 5. **Configuration properties**: Externalized in `@ConfigurationProperties` classes under `config/properties/`
 6. **WebSocket messaging**: Real-time updates broadcast to `WebSocketEndpoints.DESIGNATIONS_CHANNEL`
+7. **Pagination**: Controllers add custom headers (`X-Total-Count`, `X-Page-Number`, `X-Page-Size`, `X-Total-Pages`)
+
+### Frontend Patterns
+
+1. **Selection-based Actions** (Users, PoolList):
+   - Use `TableSelectionCell` with `selectedRows` Set state
+   - Toolbar buttons operate on selected items: `Array.from(selectedRows)[0]` to get index
+   - Buttons disabled when selection doesn't match requirements (e.g., Edit requires exactly 1 selected)
+   ```tsx
+   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+
+   <Button
+     disabled={selectedRows.size !== 1}
+     onClick={() => {
+       const selectedIndex = Array.from(selectedRows)[0];
+       if (selectedIndex !== undefined) {
+         handleEdit(items[selectedIndex]);
+       }
+     }}
+   >
+     Edit
+   </Button>
+   ```
+
+2. **Dialog-based CRUD**:
+   - Controlled `open` state with `setDialogOpen`
+   - Reuse same dialog for create (no item) and edit (with item)
+   - Success callback refreshes data and shows toast
+   ```tsx
+   const [dialogOpen, setDialogOpen] = useState(false);
+   const [editingItem, setEditingItem] = useState<Type | undefined>();
+
+   // Create: setEditingItem(undefined)
+   // Edit: setEditingItem(item)
+
+   <Dialog open={dialogOpen} onOpenChange={(_, data) => setDialogOpen(data.open)}>
+   ```
+
+3. **Confirmation Dialogs**:
+   - Separate dialog state for delete confirmations
+   - Store item to delete in state
+   - Show item details in dialog content
+   ```tsx
+   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+   const [deletingItem, setDeletingItem] = useState<Type | undefined>();
+   ```
+
+4. **Toast Notifications**:
+   - Use `useToastController` with `useId` for toaster
+   - Intent: 'success' or 'error'
+   ```tsx
+   const toasterId = useId("toaster");
+   const {dispatchToast} = useToastController(toasterId);
+
+   dispatchToast(
+     <Toast><ToastTitle>Success message</ToastTitle></Toast>,
+     {intent: 'success'}
+   );
+   ```
+
+5. **Component Refresh Pattern**:
+   - Use React `key` prop with incrementing state to force remount
+   - Useful when child component needs to refresh after parent state change
+   ```tsx
+   const [refreshKey, setRefreshKey] = useState(0);
+
+   // After data change
+   setRefreshKey(prev => prev + 1);
+
+   <ChildComponent key={refreshKey} />
+   ```
+
+6. **Table Items with IDs**:
+   - **CRITICAL**: Always include entity IDs and computed flags directly in table items
+   - Never rely on formatted display strings for lookups
+   ```tsx
+   const getItems = (pools: Pool[]) => {
+     return pools.map(p => ({
+       id: p.id,  // ✓ Include ID
+       isEnded: p.endDate !== null,  // ✓ Include computed flags
+       startDate: { label: format(new Date(p.startDate), dateFormat) },
+       // ... other display fields
+     }));
+   };
+
+   // Then access directly
+   const handleDelete = () => {
+     selectedRows.forEach(index => {
+       const item = items[index];
+       if (item.isEnded) {  // ✓ Reliable check
+         deletePool(item.id);  // ✓ Reliable ID
+       }
+     });
+   };
+   ```
+
+7. **Pagination**:
+   - Server returns pagination info in headers (axios normalizes to lowercase)
+   - Client-side pagination for display: `items.slice(startIndex, endIndex)`
+   ```tsx
+   const totalCountHeader = response.headers[PaginationHeaders.TOTAL_COUNT];
+   ```
+
+8. **Date Formatting**:
+   - Use `date-fns` format function
+   - Common pattern: `format(new Date(dateString), 'MM/dd/yyyy HH:mm:ss')`
+
+## Common Gotchas
+
+1. **Date Type Mismatch**: Pool.endDate is `java.util.Date`, not `LocalDateTime`
+   - ✗ Wrong: `pool.setEndDate(LocalDateTime.now())`
+   - ✓ Correct: `pool.setEndDate(new java.util.Date())`
+
+2. **Component Not Refreshing**: When external state changes (like starting new pool) don't trigger re-render
+   - ✗ Wrong: Expecting child component to auto-refresh
+   - ✓ Correct: Use `key` prop with incrementing state: `<Component key={refreshKey} />`
+
+3. **Table Item Mapping**: Using formatted strings to map back to original entities
+   - ✗ Wrong: `items.find(item => item.startDate.label === dateString)`
+   - ✓ Correct: Include `id` in items: `items.find(item => item.id === id)`
+
+4. **Fluent UI Dialog State**: Not using controlled state properly
+   - ✓ Correct: `<Dialog open={dialogOpen} onOpenChange={(_, data) => setDialogOpen(data.open)}>`
+
+5. **Pagination Headers**: Expecting mixed-case headers
+   - ✗ Wrong: `response.headers['X-Total-Count']`
+   - ✓ Correct: `response.headers['x-total-count']` (axios normalizes to lowercase)
+   - ✓ Better: Use constants from `PaginationHeaders`
+
+6. **Pool Deletion Validation**: Not checking if pool can be deleted
+   - ✓ Correct: Validate `pool.isActive() === false` before allowing deletion
+
+7. **Negative Duration Calculations**: Using paginated index instead of actual array position
+   - ✗ Wrong: Using loop index from paginated items
+   - ✓ Correct: `actualIndex = fullArray.findIndex(item => item.id === currentItem.id)`
+
+8. **Selection State Types**: Using array instead of Set for selected rows
+   - ✓ Correct: `useState<Set<number>>(new Set())` for O(1) lookups
+
+## API Endpoint Patterns
+
+All REST endpoints follow `/api/{resource}` pattern:
+
+**Users**: `/api/users`
+- GET /users?page=0&size=10 - List with pagination
+- POST /users - Create
+- PUT /users/{id} - Update
+- DELETE /users/{id} - Delete
+
+**Pools**: `/api/pools`
+- GET /pools - List all pools
+- GET /pools/{id}/assignments - Get pool participants/assignments
+- POST /pools/start-new - End current pool and start new one
+- DELETE /pools/{id} - Delete ended pool (cannot delete active pool)
+
+**Designations**: `/api/designations`
+- GET /designations - List all
+- GET /designations/current - Get current active designation
+- GET /designations/{id}/response?answer=ACCEPT&emailAddress=user@example.com - Respond to designation
+
+**Configurations**: `/api/configurations`
+- GET /configurations - List all
+- PUT /configurations/{id} - Update configuration value
+
+**Subscriptions**: `/api/subscriptions`
+- GET /subscriptions?page=0&size=100 - List browser push subscriptions
+
+##

@@ -9,3 +9,8 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+/* Global icon color - matches footer and header */
+svg {
+  color: #0078d4;
+}

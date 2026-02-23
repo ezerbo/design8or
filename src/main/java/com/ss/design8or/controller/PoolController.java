@@ -2,6 +2,7 @@ package com.ss.design8or.controller;
 
 import com.ss.design8or.controller.pagination.PaginationParams;
 import com.ss.design8or.controller.pagination.PaginationUtils;
+import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.Pool;
 import com.ss.design8or.model.User;
 import com.ss.design8or.service.PoolService;
@@ -44,15 +45,43 @@ public class PoolController {
 	}
 
 	@GetMapping("/{id}/participants")
-	public ResponseEntity<List<User>> getParticipants(@PathVariable Long id) {
-		return ResponseEntity.ok(poolService.getParticipants(id));
+	public ResponseEntity<List<User>> getParticipants(
+			@PathVariable Long id,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
+		Page<User> participantsPage = poolService.getParticipants(id, PageRequest.of(page, size));
+		return ResponseEntity.ok()
+				.headers(PaginationUtils.getPaginationHeaders(participantsPage))
+				.body(participantsPage.getContent());
 	}
 
 	@GetMapping("/{id}/candidates")
-	public ResponseEntity<List<User>> getCandidates(@PathVariable Long id) {
-		return ResponseEntity.ok(poolService.getCandidates(id));
+	public ResponseEntity<List<User>> getCandidates(
+			@PathVariable Long id,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page) {
+		Page<User> candidatesPage = poolService.getCandidates(id, PageRequest.of(page, size));
+		return ResponseEntity.ok()
+				.headers(PaginationUtils.getPaginationHeaders(candidatesPage))
+				.body(candidatesPage.getContent());
 	}
 
-	// TODO Add ability to start a new pool?
-	
+	@GetMapping("/{id}/assignments")
+	public ResponseEntity<List<Assignment>> getAssignments(@PathVariable Long id) {
+		List<Assignment> assignments = poolService.getAcceptedAssignments(id);
+		return ResponseEntity.ok(assignments);
+	}
+
+	@PostMapping("/start-new")
+	public ResponseEntity<Pool> startNewPool() {
+		Pool newPool = poolService.startNewPool();
+		return ResponseEntity.ok(newPool);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePool(@PathVariable Long id) {
+		poolService.deletePool(id);
+		return ResponseEntity.noContent().build();
+	}
+
 }

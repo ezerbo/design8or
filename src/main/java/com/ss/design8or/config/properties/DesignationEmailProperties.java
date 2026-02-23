@@ -16,8 +16,10 @@ import lombok.NoArgsConstructor;
 public class DesignationEmailProperties {
 
 	private String from;
-	
+
 	private String subject;
 
 	private String serviceBaseUrl;
+
+	private String redirectUrl;
 }

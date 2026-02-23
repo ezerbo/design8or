@@ -4,7 +4,7 @@ import com.ss.design8or.controller.pagination.PaginationParams;
 import com.ss.design8or.controller.pagination.PaginationUtils;
 import com.ss.design8or.controller.response.DesignationAnswer;
 import com.ss.design8or.controller.response.DesignationResponse;
-import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.Assignment;
 import com.ss.design8or.service.DesignationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +35,35 @@ public class DesignationController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Designation>> findAll(
+	public ResponseEntity<List<Assignment>> findAll(
 			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_NUMBER) int page,
 			@RequestParam(defaultValue = PaginationParams.DEFAULT_PAGE_SIZE) int size) {
-		Page<Designation> designationsPage = service.findAll(PageRequest.of(page, size));
+		Page<Assignment> assignmentsPage = service.findAll(PageRequest.of(page, size));
 		return ResponseEntity.ok()
-				.headers(PaginationUtils.getPaginationHeaders(designationsPage))
-				.body(designationsPage.getContent());
+				.headers(PaginationUtils.getPaginationHeaders(assignmentsPage))
+				.body(assignmentsPage.getContent());
+	}
+
+	@GetMapping("/current")
+	public ResponseEntity<Assignment> getCurrent() {
+		return service.getCurrentDesignation()
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@PostMapping("/assignments/{assignmentId}/accept")
+	public ResponseEntity<Assignment> acceptDesignation(@PathVariable Long assignmentId) {
+		return ResponseEntity.ok(service.accept(assignmentId));
+	}
+
+	@PostMapping("/assignments/{assignmentId}/decline")
+	public ResponseEntity<Assignment> declineDesignation(@PathVariable Long assignmentId) {
+		return ResponseEntity.ok(service.decline(assignmentId));
+	}
+
+	@PostMapping("/assignments/{assignmentId}/designate")
+	public ResponseEntity<Assignment> designateManually(@PathVariable Long assignmentId) {
+		return ResponseEntity.ok(service.designateManually(assignmentId));
 	}
 
 }

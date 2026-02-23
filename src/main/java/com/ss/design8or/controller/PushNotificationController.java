@@ -49,4 +49,10 @@ public class PushNotificationController {
 		pushNotificationService.sendNotification(id, payload);
 		return ResponseEntity.ok().build();
 	}
+
+	@PostMapping("/test")
+	public ResponseEntity<String> testNotification() {
+		pushNotificationService.sendAssignmentNotification("test@example.com");
+		return ResponseEntity.ok("Test notification sent to all subscribers");
+	}
 }

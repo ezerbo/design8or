@@ -18,7 +18,7 @@ import java.util.Objects;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"assignments", "designations"})
+@ToString(exclude = {"designations"})
 @Table(name = "user")
 public class User {
 
@@ -41,11 +41,7 @@ public class User {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
-	private List<Assignment> assignments;
-	
-	@JsonIgnore
-	@OneToMany(mappedBy = "user", orphanRemoval = true)
-	private List<Designation> designations;
+	private List<Assignment> designations;
 
 	@Override
 	public boolean equals(Object o) {

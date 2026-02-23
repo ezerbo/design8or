@@ -32,14 +32,13 @@ public class Design8or {
 		String port = env.getProperty("server.port", "8080");
 		String contextPath = env.getProperty("server.servlet.context-path", "");
 
-		log.info("""
-                        
-                        ----------------------------------------------------------
-                            {} is running! Access URLs:
-                            Local:      http://localhost:{}{}
-                            External:   http://{}:{}{}
-                            Profile(s): {}
-                        ----------------------------------------------------------""",
+		log.info("\n\n" +
+				"----------------------------------------------------------\n" +
+				"    {} is running! Access URLs:\n" +
+				"    Local:      http://localhost:{}{}\n" +
+				"    External:   http://{}:{}{}\n" +
+				"    Profile(s): {}\n" +
+				"----------------------------------------------------------",
 				appName,
 				port, contextPath,
 				getHostAddress(), port, contextPath,

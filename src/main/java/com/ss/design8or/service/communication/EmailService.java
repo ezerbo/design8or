@@ -18,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.Context;
 
 import com.ss.design8or.config.properties.ServiceProperties;
-import com.ss.design8or.model.Designation;
+import com.ss.design8or.model.Assignment;
 import com.ss.design8or.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,19 +65,19 @@ public class EmailService {
     }
     
     @Async
-    public void sendEmail(Designation designation) {
-       sendEmail(designation, designation.getUser());
+    public void sendEmail(Assignment assignment) {
+       sendEmail(assignment, assignment.getUser());
     }
-    
+
     @Async
-    public void sendEmail(Designation designation, User candidate) {
-        String content = templateEngine.process("designation", getContext(designation, candidate));
+    public void sendEmail(Assignment assignment, User candidate) {
+        String content = templateEngine.process("designation", getContext(assignment, candidate));
         String subject = properties.getDesignationEmail().getSubject();
         sendEmail(candidate.getEmailAddress(), subject, content);
     }
 
-    public void broadcastDeclinationEmail(Designation designation, List<User> candidates) {
-        candidates.forEach(candidate -> sendEmail(designation, candidate));
+    public void broadcastDeclinationEmail(Assignment assignment, List<User> candidates) {
+        candidates.forEach(candidate -> sendEmail(assignment, candidate));
     }
 
     public void sendReassignmentEmail(User currentAssignee) {
@@ -88,24 +88,27 @@ public class EmailService {
                 "The Design8or Team";
         sendEmail(currentAssignee.getEmailAddress(), subject, content);
     }
-    
-    private String getResponseUrl(long designationId, String candidateEmailAddress) {
+
+    private String getResponseUrl(long assignmentId, String candidateEmailAddress) {
         return UriComponentsBuilder.fromUriString(properties.getDesignationEmail().getServiceBaseUrl())
                 .path("/designations/{id}/response")
                 .queryParam("emailAddress", candidateEmailAddress)
-                .buildAndExpand(Map.of("id", designationId))
+                .buildAndExpand(Map.of("id", assignmentId))
                 .toUriString();
     }
 
-    private Context getContext(Designation designation, User candidate) {
+    private Context getContext(Assignment assignment, User candidate) {
         Pool currentPool = poolService.getCurrent();
         Context context = new Context();
         context.setVariable("user", candidate);
-        context.setVariable("responseUrl", getResponseUrl(designation.getId(), candidate.getEmailAddress()));
+        context.setVariable("responseUrl", getResponseUrl(assignment.getId(), candidate.getEmailAddress()));
         context.setVariable("serviceBaseUrl", properties.getDesignationEmail().getServiceBaseUrl());
+        context.setVariable("redirectUrl", properties.getDesignationEmail().getRedirectUrl());
+        context.setVariable("designationId", assignment.getId());
+        context.setVariable("emailAddress", candidate.getEmailAddress());
         context.setVariable("year", LocalDate.now().getYear());
-        context.setVariable("lead", designation.getUser());
-        context.setVariable("isDeclined", DesignationStatus.DECLINED.equals(designation.getStatus()));
+        context.setVariable("lead", assignment.getUser());
+        context.setVariable("isDeclined", DesignationStatus.DECLINED.equals(assignment.getDesignationStatus()));
         context.setVariable("candidatesCount", poolService.getCandidates(currentPool.getId()).size());
         context.setVariable("participantsCount", poolService.getParticipants(currentPool.getId()).size());
         context.setVariable("poolStartDate", currentPool.getStartDate());

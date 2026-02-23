@@ -17,7 +17,7 @@ public class MessagingConfiguration implements WebSocketMessageBrokerConfigurer 
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes(WebSocketEndpoints.WS_BROKER_DESTINATION_PREFIX)
         	.enableSimpleBroker(WebSocketEndpoints.DESIGNATIONS_CHANNEL, WebSocketEndpoints.PARAMETERS_CHANNEL,
-        			WebSocketEndpoints.POOLS_CHANNEL, WebSocketEndpoints.ASSIGNMENTS_CHANNEL);
+        			WebSocketEndpoints.POOLS_CHANNEL);
     }
 	
     public void registerStompEndpoints(StompEndpointRegistry registry) {

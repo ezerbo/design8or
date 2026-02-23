@@ -59,6 +59,7 @@ app:
     from: zerboedouard@gmail.com
     subject: You have been selected to be the lead
     service-base-url: http://localhost:8080
+    redirect-url: http://localhost:3000
 
   browser-push-notification-keys:
     subject: Designation Event

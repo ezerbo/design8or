@@ -1,0 +1,31 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.poolsRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.usersRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}

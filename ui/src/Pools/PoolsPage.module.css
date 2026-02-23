@@ -1,0 +1,17 @@
+.mainLayout {
+    display: flex;
+    min-height: 600px;
+    gap: 16px;
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    margin: 10px;
+    max-width: 100%;
+}

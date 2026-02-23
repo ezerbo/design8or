@@ -4,7 +4,7 @@ Candidates participate in a designation pool and everyone has to be designated b
 
 Please find the use cases below
 
-- Candidates are automatically designated by the system.
+- The system automatically designates candidates.
   - A candidate is designated randomly from the list of candidates that have not yet participated in the current pool
   - The designated candidate will receive an email with details about the designation
 - Candidates can accept or decline the designation

@@ -1,0 +1,44 @@
+.poolListContainer {
+    width: 100%;
+    flex: 1;
+}
+
+.paginationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 8px 0;
+}
+
+.paginationControls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pageInfo {
+    font-size: 14px;
+    color: #605e5c;
+}
+
+/* Ensure icons match footer color */
+table svg {
+    color: #0078d4;
+}
+
+/* Table header text color matches footer */
+table thead th {
+    color: #0078d4;
+}
+
+/* Status column colors */
+.statusEnded {
+    color: #107c10;
+    font-weight: 500;
+}
+
+.statusActive {
+    color: #ff8c00;
+    font-weight: 500;
+}

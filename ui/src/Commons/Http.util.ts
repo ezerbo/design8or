@@ -33,3 +33,23 @@ export async function httpGet<T>(url: string): Promise<T> {
         headers: {'Accept': 'application/json'}
     });
 }
+
+export async function httpGetWithHeaders<T>(url: string): Promise<AxiosResponse<T>> {
+    try {
+        const response: AxiosResponse<T> = await axios({
+            method: 'GET',
+            url: `${url}`,
+            headers: {'Accept': 'application/json'}
+        });
+        return response;
+    } catch (error: any) {
+        if (error.response) {
+            console.error('Server responded with an error:', error.response.data);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error setting up request:', error.message);
+        }
+        throw error;
+    }
+}

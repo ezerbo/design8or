@@ -1,7 +1,6 @@
-import {User} from "../Users/User";
-
 export interface Pool {
-    startDate: Date;
-    enDate: Date;
-    lead?: User;
+    id: number;
+    startDate: string;
+    endDate: string | null;
+    participantCount: number;
 }
