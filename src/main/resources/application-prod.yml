@@ -8,12 +8,10 @@ spring:
       password: ${ADMIN_PASSWORD:designator}
   
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    database: POSTGRESQL
     show-sql: false
     properties:
       hibernate.generate_statistics: false
-    hibernate: 
+    hibernate:
       ddl-auto: update
     defer-datasource-initialization: true
   
