@@ -39,7 +39,7 @@ spring:
 
   sql:
     init:
-      data-locations: classpath:data/data.sql
+      data-locations: classpath:data/data-postgres.sql
       mode: always
 
   web:
