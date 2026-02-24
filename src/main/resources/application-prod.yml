@@ -12,10 +12,9 @@ spring:
     properties:
       hibernate.generate_statistics: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     defer-datasource-initialization: true
-    # Note: ddl-auto is set to create-drop for initial deployment
-    # After successful deployment, change to 'validate' or 'none'
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   
   quartz: 
     jdbc: 
@@ -42,9 +41,6 @@ spring:
   sql:
     init:
       mode: never
-      # Seed files are disabled in production to avoid duplicate key errors
-      # To seed production database, run the SQL manually:
-      # psql $DATABASE_URL < src/main/resources/data/data-postgres.sql
 
   web:
     resources:
