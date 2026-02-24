@@ -260,7 +260,9 @@ EMAIL_FROM=noreply@yourdomain.com
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` |
+| `DB_HOST` | PostgreSQL host | `dpg-xxxxx.oregon-postgres.render.com` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_NAME` | Database name | `design8or` |
 | `DB_USERNAME` | Database username | `design8or` |
 | `DB_PASSWORD` | Database password | `securepassword123` |
 | `FRONTEND_URL` | Frontend URL (for CORS) | `https://design8or.onrender.com` |
