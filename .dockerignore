@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+target/
+ui/node_modules/
+ui/build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Documentation
+*.md
+!README.md
+
+# Deployment configs
+render.yaml
+railway.json
+
+# Testing
+src/test/
+
+# Logs
+*.log

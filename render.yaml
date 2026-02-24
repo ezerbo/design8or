@@ -2,9 +2,8 @@ services:
   # Backend Service
   - type: web
     name: design8or-backend
-    env: java
-    buildCommand: mvn clean package -DskipTests
-    startCommand: java -jar -Dspring.profiles.active=prod target/design8or.jar
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -21,7 +20,7 @@ services:
           name: design8or-db
           property: password
       - key: FRONTEND_URL
-        value: https://design8or-frontend.onrender.com
+        value: https://design8or.onrender.com
       - key: BACKEND_URL
         sync: false
       - key: ADMIN_USERNAME
@@ -42,7 +41,7 @@ services:
 
   # Frontend Service
   - type: web
-    name: design8or-frontend
+    name: design8or
     env: static
     buildCommand: cd ui && npm install && npm run build
     staticPublishPath: ui/build

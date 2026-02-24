@@ -39,8 +39,10 @@ This guide covers deploying Design8or to various cloud platforms at low or no co
 3. **Create New Blueprint Instance**
    - Click "New +" → "Blueprint"
    - Connect your GitHub repository
-   - Render will automatically detect `render.yaml`
+   - Render will automatically detect `render.yaml` and `Dockerfile`
    - Click "Apply"
+
+   **Note**: The backend uses Docker to build and run the Java application
 
 4. **Configure Environment Variables**
    
@@ -61,7 +63,7 @@ This guide covers deploying Design8or to various cloud platforms at low or no co
 5. **Wait for deployment** (~5-10 minutes)
 
 6. **Access your app**
-   - Frontend: `https://design8or-frontend.onrender.com`
+   - Frontend: `https://design8or.onrender.com`
    - Backend API: `https://design8or-backend.onrender.com`
    - Swagger: `https://design8or-backend.onrender.com/swagger-ui.html`
 
