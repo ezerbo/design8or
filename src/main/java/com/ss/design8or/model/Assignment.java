@@ -42,11 +42,11 @@ public class Assignment {
     private LocalDateTime assignmentDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "designation_status")
+    @Column(name = "designation_status", columnDefinition = "VARCHAR(20)")
     private DesignationStatus designationStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "designation_type")
+    @Column(name = "designation_type", columnDefinition = "VARCHAR(20)")
     private DesignationType designationType;
 
     @Column(name = "designated_at")
