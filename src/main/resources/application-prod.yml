@@ -39,8 +39,10 @@ spring:
 
   sql:
     init:
-      data-locations: classpath:data/data-postgres.sql
-      mode: always
+      mode: never
+      # Seed files are disabled in production to avoid duplicate key errors
+      # To seed production database, run the SQL manually:
+      # psql $DATABASE_URL < src/main/resources/data/data-postgres.sql
 
   web:
     resources:
