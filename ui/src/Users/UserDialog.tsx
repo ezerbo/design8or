@@ -10,7 +10,8 @@ import {
     Button,
     Input,
     Field,
-    makeStyles
+    makeStyles,
+    Spinner
 } from "@fluentui/react-components";
 import {User} from "./User";
 import {API_BASE_URL} from "../Commons/Paths";
@@ -114,6 +115,7 @@ export const UserDialog: React.FunctionComponent<UserDialogProps> = ({user, open
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !firstName || !lastName || !emailAddress}
+                            icon={loading ? <Spinner size="tiny" /> : undefined}
                         >
                             {loading ? 'Saving...' : user ? 'Update' : 'Create'}
                         </Button>

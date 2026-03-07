@@ -22,6 +22,7 @@ import {
     DialogBody,
     DialogContent,
     DialogActions,
+    Spinner,
 } from "@fluentui/react-components";
 import './PoolList.css';
 
@@ -172,7 +173,8 @@ export const PoolList: React.FunctionComponent<{
         <Card className={styles.card}>
             <div className={styles.title}>Pool History</div>
             <Divider className={styles.divider} />
-            <div style={{display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '16px'}}>
+            <div style={{display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '16px', alignItems: 'center'}}>
+                {loading && <Spinner size="tiny" label="Processing..." />}
                 <Button
                     appearance="secondary"
                     icon={<DeleteRegular />}

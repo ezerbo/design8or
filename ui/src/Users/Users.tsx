@@ -29,7 +29,8 @@ import {
     DialogTitle,
     DialogBody,
     DialogActions,
-    DialogContent
+    DialogContent,
+    Spinner
 } from "@fluentui/react-components";
 import {UserDialog} from "./UserDialog";
 import axios from "axios";
@@ -115,6 +116,7 @@ export const Users: React.FunctionComponent = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
     const [editingUser, setEditingUser] = React.useState<User | undefined>(undefined);
     const [deletingUser, setDeletingUser] = React.useState<User | undefined>(undefined);
+    const [loading, setLoading] = React.useState(false);
     const [paginationInfo, setPaginationInfo] = React.useState<PaginationInfo>({
         totalCount: 0,
         pageNumber: 0,
@@ -123,6 +125,7 @@ export const Users: React.FunctionComponent = () => {
     });
 
     const fetchUsers = () => {
+        setLoading(true);
         const url = `${API_BASE_URL}/users?page=${currentPage}&size=${pageSize}`;
         httpGetWithHeaders<User[]>(url)
             .then((response) => {
@@ -141,7 +144,8 @@ export const Users: React.FunctionComponent = () => {
                     pageSize: parseInt(pageSizeHeader || String(DEFAULT_PAGE_SIZE)),
                     totalPages: parseInt(totalPagesHeader || '0')
                 });
-            });
+            })
+            .finally(() => setLoading(false));
     };
 
     useEffect(() => {
@@ -176,6 +180,7 @@ export const Users: React.FunctionComponent = () => {
     const handleDeleteUser = async () => {
         if (!deletingUser?.id) return;
 
+        setLoading(true);
         try {
             await axios.delete(`${API_BASE_URL}/users/${deletingUser.id}`);
             dispatchToast(
@@ -194,6 +199,8 @@ export const Users: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -255,7 +262,7 @@ export const Users: React.FunctionComponent = () => {
                                     handleOpenEditDialog(users[selectedIndex]);
                                 }
                             }}
-                            disabled={selectedRows.size !== 1}
+                            disabled={loading || selectedRows.size !== 1}
                         >
                             Edit
                         </Button>
@@ -268,11 +275,11 @@ export const Users: React.FunctionComponent = () => {
                                     handleOpenDeleteDialog(users[selectedIndex]);
                                 }
                             }}
-                            disabled={selectedRows.size === 0}
+                            disabled={loading || selectedRows.size === 0}
                             style={{
-                                backgroundColor: selectedRows.size === 0 ? undefined : '#d13438',
-                                color: selectedRows.size === 0 ? undefined : 'white',
-                                borderColor: selectedRows.size === 0 ? undefined : '#d13438'
+                                backgroundColor: (loading || selectedRows.size === 0) ? undefined : '#d13438',
+                                color: (loading || selectedRows.size === 0) ? undefined : 'white',
+                                borderColor: (loading || selectedRows.size === 0) ? undefined : '#d13438'
                             }}
                         >
                             Delete
@@ -281,6 +288,7 @@ export const Users: React.FunctionComponent = () => {
                             appearance="primary"
                             icon={<AddRegular />}
                             onClick={handleOpenCreateDialog}
+                            disabled={loading}
                         >
                             New User
                         </Button>
@@ -288,6 +296,12 @@ export const Users: React.FunctionComponent = () => {
                 </div>
                 <Divider className={styles.divider} />
             <div className={styles.tableContainer}>
+                {loading ? (
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '32px'}}>
+                        <Spinner size="medium" label="Loading..." />
+                    </div>
+                ) : (
+                <>
                 <Table arial-label="Users table">
                     <TableHeader>
                         <TableRow>
@@ -371,6 +385,8 @@ export const Users: React.FunctionComponent = () => {
                             </Button>
                         </div>
                     </div>
+                )}
+                </>
                 )}
             </div>
             <UserDialog

@@ -50,3 +50,40 @@
     font-size: 14px;
     font-weight: 500;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .navCard {
+        width: 100%;
+        height: auto;
+        padding: 12px;
+    }
+
+    .navList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .navItem {
+        flex: 1;
+        min-width: calc(50% - 4px);
+        padding: 10px 12px;
+        justify-content: center;
+        margin-bottom: 0;
+    }
+
+    .navLabel {
+        font-size: 12px;
+    }
+
+    .navIcon {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navItem {
+        min-width: 100%;
+    }
+}

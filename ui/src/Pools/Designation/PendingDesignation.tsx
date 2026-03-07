@@ -3,7 +3,7 @@ import {Assignment} from "./Designation";
 import {httpGet} from "../../Commons/Http.util";
 import {format} from "date-fns";
 import {GET_CURRENT_DESIGNATION} from "../../Commons/Paths";
-import {Card, Divider, makeStyles, tokens, Badge} from "@fluentui/react-components";
+import {Card, Divider, makeStyles, tokens, Badge, Spinner} from "@fluentui/react-components";
 import {Calendar24Regular, ClipboardTaskListLtr24Regular, Mail24Regular, Person24Regular} from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
@@ -46,12 +46,22 @@ export const PendingDesignation: React.FunctionComponent = () => {
     const styles = useStyles();
 
     const [designation, setDesignation] = React.useState<Assignment>();
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         httpGet<Assignment>(GET_CURRENT_DESIGNATION)
             .then((designation) => setDesignation(designation))
-            .catch((error) => console.error('No current designation found', error));
+            .catch((error) => console.error('No current designation found', error))
+            .finally(() => setLoading(false));
     }, []);
+
+    if (loading) {
+        return (
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '32px'}}>
+                <Spinner size="medium" label="Loading..." />
+            </div>
+        );
+    }
 
     return (
         <div>

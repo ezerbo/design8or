@@ -28,7 +28,8 @@ import {
     DialogBody,
     DialogContent,
     DialogActions,
-    Tooltip
+    Tooltip,
+    Spinner
 } from "@fluentui/react-components";
 import {MailRegular, SlideTextRegular, PersonAvailableRegular, CalendarRegular, PeopleRegular, PersonRegular, ChartMultipleRegular, PeopleListRegular} from "@fluentui/react-icons";
 import axios from "axios";
@@ -134,6 +135,7 @@ export const Candidates: React.FunctionComponent = () => {
     const [candidates, setCandidates] = useState<User[]>([]);
     const [currentDesignation, setCurrentDesignation] = useState<Assignment | null>(null);
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [participantsDialogOpen, setParticipantsDialogOpen] = useState(false);
@@ -142,16 +144,18 @@ export const Candidates: React.FunctionComponent = () => {
     const participantsPageSize = 5;
 
     const fetchCurrentPool = async () => {
+        setFetching(true);
         try {
             const pools = await httpGet<Pool[]>(`${API_BASE_URL}/pools?size=10&page=0`);
             const activePool = pools.find(pool => pool.endDate === null);
             setCurrentPool(activePool || null);
             if (activePool) {
-                fetchCandidates(activePool.id);
-                fetchCurrentDesignation();
+                await Promise.all([fetchCandidates(activePool.id), fetchCurrentDesignation()]);
             }
         } catch (error) {
             console.error('Error fetching current pool:', error);
+        } finally {
+            setFetching(false);
         }
     };
 
@@ -273,6 +277,19 @@ export const Candidates: React.FunctionComponent = () => {
             setLoading(false);
         }
     };
+
+    if (fetching) {
+        return (
+            <>
+                <Toaster toasterId={toasterId} position="top-end" />
+                <Card className={styles.card}>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '48px'}}>
+                        <Spinner size="medium" label="Loading..." />
+                    </div>
+                </Card>
+            </>
+        );
+    }
 
     if (!currentPool) {
         return (

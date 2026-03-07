@@ -4,7 +4,7 @@ import {httpGet} from "../Commons/Http.util";
 import {Pool} from "./Pool";
 import {GET_POOLS_URL, START_NEW_POOL_URL, deletePoolPath} from "../Commons/Paths";
 import {PendingDesignation} from "./Designation/PendingDesignation";
-import {Toast, ToastTitle, Toaster, useToastController, useId} from "@fluentui/react-components";
+import {Toast, ToastTitle, Toaster, useToastController, useId, Spinner} from "@fluentui/react-components";
 import axios from "axios";
 import './Pools.css';
 
@@ -16,6 +16,7 @@ export const Pools: React.FunctionComponent = () => {
     const [pools, setPools] = React.useState<Pool[]>();
     const [, setCurrentPool] = React.useState<Pool>();
     const [loading, setLoading] = React.useState(false);
+    const [fetching, setFetching] = React.useState(true);
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     const fetchPools = async () => {
@@ -25,6 +26,8 @@ export const Pools: React.FunctionComponent = () => {
             setCurrentPool(pools.find(pool => pool.endDate === null));
         } catch (error) {
             console.error('Error fetching pools:', error);
+        } finally {
+            setFetching(false);
         }
     };
 
@@ -85,10 +88,16 @@ export const Pools: React.FunctionComponent = () => {
     return (
         <div className="container">
             <Toaster toasterId={toasterId} position="top-end" />
+            {fetching ? (
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '48px'}}>
+                    <Spinner size="medium" label="Loading..." />
+                </div>
+            ) : (
             <div className="poolsRow">
                 <PendingDesignation key={refreshKey} />
                 {pools && <PoolList pools={pools} onStartNewPool={handleStartNewPool} onDeletePools={handleDeletePools} loading={loading} />}
             </div>
+            )}
             {/*<div className="usersRow">*/}
             {/*    <div className="section">*/}
             {/*        {currentPool && (*/}

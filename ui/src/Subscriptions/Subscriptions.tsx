@@ -18,6 +18,7 @@ import {
     useId,
     Button,
     Badge,
+    Spinner,
 } from "@fluentui/react-components";
 import {PlugDisconnectedRegular, PlugConnectedRegular, CheckmarkCircleRegular, DismissCircleRegular} from "@fluentui/react-icons";
 import {httpGet} from "../Commons/Http.util";
@@ -66,8 +67,11 @@ export const Subscriptions: React.FunctionComponent = () => {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
+    const [fetchingSubscriptions, setFetchingSubscriptions] = useState(false);
+    const [subscribing, setSubscribing] = useState(false);
 
     const fetchSubscriptions = async () => {
+        setFetchingSubscriptions(true);
         try {
             const subs = await httpGet<Subscription[]>(`${API_BASE_URL}/subscriptions?size=100&page=0`);
             setSubscriptions(subs);
@@ -79,6 +83,8 @@ export const Subscriptions: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setFetchingSubscriptions(false);
         }
     };
 
@@ -95,6 +101,7 @@ export const Subscriptions: React.FunctionComponent = () => {
     };
 
     const handleSubscribe = async () => {
+        setSubscribing(true);
         try {
             const success = await NotificationService.subscribe();
             if (success) {
@@ -123,10 +130,13 @@ export const Subscriptions: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setSubscribing(false);
         }
     };
 
     const handleUnsubscribe = async () => {
+        setSubscribing(true);
         try {
             const success = await NotificationService.unsubscribe();
             if (success) {
@@ -146,6 +156,8 @@ export const Subscriptions: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setSubscribing(false);
         }
     };
 
@@ -164,7 +176,9 @@ export const Subscriptions: React.FunctionComponent = () => {
                         Browser Push Notification Subscriptions
                     </div>
                     <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                        {!isChecking && (
+                        {isChecking ? (
+                            <Spinner size="tiny" label="Checking..." />
+                        ) : (
                             <>
                                 <Badge
                                     appearance="filled"
@@ -177,15 +191,19 @@ export const Subscriptions: React.FunctionComponent = () => {
                                     <Button
                                         appearance="secondary"
                                         onClick={handleUnsubscribe}
+                                        disabled={subscribing}
+                                        icon={subscribing ? <Spinner size="tiny" /> : <PlugDisconnectedRegular />}
                                     >
-                                        Unsubscribe
+                                        {subscribing ? 'Unsubscribing...' : 'Unsubscribe'}
                                     </Button>
                                 ) : (
                                     <Button
                                         appearance="primary"
                                         onClick={handleSubscribe}
+                                        disabled={subscribing}
+                                        icon={subscribing ? <Spinner size="tiny" /> : <PlugConnectedRegular />}
                                     >
-                                        Subscribe to Notifications
+                                        {subscribing ? 'Subscribing...' : 'Subscribe to Notifications'}
                                     </Button>
                                 )}
                             </>
@@ -194,7 +212,11 @@ export const Subscriptions: React.FunctionComponent = () => {
                 </div>
                 <Divider className={styles.divider}/>
 
-                {subscriptions.length === 0 ? (
+                {fetchingSubscriptions ? (
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '32px'}}>
+                        <Spinner size="medium" label="Loading..." />
+                    </div>
+                ) : subscriptions.length === 0 ? (
                     <div style={{textAlign: 'center', padding: '32px', color: '#605e5c'}}>
                         No subscriptions found
                     </div>
@@ -231,26 +253,12 @@ export const Subscriptions: React.FunctionComponent = () => {
                                     </TableCell>
                                     <TableCell>
                                         <TableCellLayout>
-                                            <div style={{
-                                                maxWidth: '200px',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {sub.auth}
-                                            </div>
+                                            ••••••••••••••••
                                         </TableCellLayout>
                                     </TableCell>
                                     <TableCell>
                                         <TableCellLayout>
-                                            <div style={{
-                                                maxWidth: '200px',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {sub.p256dh}
-                                            </div>
+                                            ••••••••••••••••
                                         </TableCellLayout>
                                     </TableCell>
                                 </TableRow>

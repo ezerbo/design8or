@@ -26,3 +26,44 @@ table thead th {
     font-size: 14px;
     color: #605e5c;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .paginationContainer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .paginationControls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pageInfo {
+        text-align: center;
+        font-size: 13px;
+    }
+
+    /* Make tables scrollable on mobile */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table td,
+    table th {
+        padding: 8px !important;
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    table td,
+    table th {
+        padding: 6px !important;
+        font-size: 12px !important;
+    }
+}

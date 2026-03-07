@@ -32,3 +32,20 @@
 .controlButton {
     margin-right: 5px;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .mainLayout {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .horizontalLayout {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .card {
+        margin: 5px;
+    }
+}

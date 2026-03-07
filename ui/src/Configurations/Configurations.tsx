@@ -24,7 +24,8 @@ import {
     DialogTitle,
     DialogBody,
     DialogActions,
-    DialogContent
+    DialogContent,
+    Spinner
 } from "@fluentui/react-components";
 import {
     SettingsRegular,
@@ -87,8 +88,11 @@ export const Configurations: React.FunctionComponent = () => {
     const [editingConfig, setEditingConfig] = useState<Configuration | null>(null);
     const [editValue, setEditValue] = useState("");
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const fetchConfigurations = async () => {
+        setLoading(true);
         try {
             const configs = await httpGet<Configuration[]>(`${API_BASE_URL}/configurations`);
             setConfigurations(configs);
@@ -100,6 +104,8 @@ export const Configurations: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -116,6 +122,7 @@ export const Configurations: React.FunctionComponent = () => {
     const handleSave = async () => {
         if (!editingConfig) return;
 
+        setSaving(true);
         try {
             await axios.put(`${API_BASE_URL}/configurations/${editingConfig.id}`, {
                 value: editValue
@@ -138,6 +145,8 @@ export const Configurations: React.FunctionComponent = () => {
                 </Toast>,
                 {intent: 'error'}
             );
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -177,7 +186,15 @@ export const Configurations: React.FunctionComponent = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {configurations.map((config) => (
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={4}>
+                                        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '32px'}}>
+                                            <Spinner size="medium" label="Loading..." />
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : configurations.map((config) => (
                                 <TableRow key={config.id}>
                                     <TableCell>
                                         <TableCellLayout>
@@ -191,8 +208,8 @@ export const Configurations: React.FunctionComponent = () => {
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
                                                 whiteSpace: 'nowrap'
-                                            }} title={config.value}>
-                                                {config.value}
+                                            }}>
+                                                {config.key.startsWith('browser-push-notification') ? '••••••••••••••••' : config.value}
                                             </div>
                                         </TableCellLayout>
                                     </TableCell>
@@ -214,6 +231,7 @@ export const Configurations: React.FunctionComponent = () => {
                                 </TableRow>
                             ))}
                         </TableBody>
+
                     </Table>
                 </Card>
             </div>
@@ -259,9 +277,10 @@ export const Configurations: React.FunctionComponent = () => {
                             <Button
                                 appearance="primary"
                                 onClick={handleSave}
-                                icon={<SaveRegular/>}
+                                disabled={saving}
+                                icon={saving ? <Spinner size="tiny" /> : <SaveRegular/>}
                             >
-                                Save
+                                {saving ? 'Saving...' : 'Save'}
                             </Button>
                         </DialogActions>
                     </DialogBody>
