@@ -6,7 +6,6 @@ import {PoolsPage} from "./Pools/PoolsPage";
 import {UsersPage} from "./Users/UsersPage";
 import {DesignationResponse} from "./Designation/DesignationResponse";
 import {ConfigurationsPage} from "./Configurations/ConfigurationsPage";
-import {SubscriptionsPage} from "./Subscriptions/SubscriptionsPage";
 import {NotificationService} from "./Commons/NotificationService";
 
 export const Design8or: React.FunctionComponent = () => {
@@ -37,7 +36,6 @@ export const Design8or: React.FunctionComponent = () => {
                 <Route path='/users' element={<UsersPage />} />
                 <Route path='/pools' element={<PoolsPage />} />
                 <Route path='/configurations' element={<ConfigurationsPage />} />
-                <Route path='/subscriptions' element={<SubscriptionsPage />} />
                 <Route path='/designation-response' element={<DesignationResponse />} />
                 {/*<Route path='/designations' element={<Designations />} />*/}
             </Routes>

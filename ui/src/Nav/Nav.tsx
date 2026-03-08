@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { HomeRegular, PeopleRegular, SettingsRegular, GridRegular, PlugDisconnectedRegular } from "@fluentui/react-icons";
+import { HomeRegular, PeopleRegular, SettingsRegular, GridRegular } from "@fluentui/react-icons";
 import { Card } from "@fluentui/react-components";
 import './Nav.css';
 
@@ -12,8 +12,7 @@ export const Nav: React.FunctionComponent = () => {
         { path: '/', label: 'Home', icon: <HomeRegular /> },
         { path: '/users', label: 'Users', icon: <PeopleRegular /> },
         { path: '/pools', label: 'Pools', icon: <GridRegular /> },
-        { path: '/configurations', label: 'Configurations', icon: <SettingsRegular /> },
-        { path: '/subscriptions', label: 'Subscriptions', icon: <PlugDisconnectedRegular /> }
+        { path: '/configurations', label: 'Configurations', icon: <SettingsRegular /> }
     ];
 
     return (
